@@ -12,6 +12,7 @@
 #include <linux/export.h>
 #include <linux/kexec.h>
 #include <linux/kmod.h>
+#include <linux/lkm_checkpoints.h>
 #include <linux/kmsg_dump.h>
 #include <linux/reboot.h>
 #include <linux/suspend.h>
@@ -82,6 +83,7 @@ void __weak (*pm_power_off)(void);
  */
 void emergency_restart(void)
 {
+	lkm_checkpoints_dump();
 	kmsg_dump(KMSG_DUMP_EMERG);
 	system_state = SYSTEM_RESTART;
 	machine_emergency_restart();
@@ -282,6 +284,7 @@ void kernel_restart(char *cmd)
 		pr_emerg("Restarting system\n");
 	else
 		pr_emerg("Restarting system with command '%s'\n", cmd);
+	lkm_checkpoints_dump();
 	kmsg_dump(KMSG_DUMP_SHUTDOWN);
 	machine_restart(cmd);
 }
@@ -309,6 +312,7 @@ void kernel_halt(void)
 		pr_emerg("Power off not available: System halted instead\n");
 	else
 		pr_emerg("System halted\n");
+	lkm_checkpoints_dump();
 	kmsg_dump(KMSG_DUMP_SHUTDOWN);
 	machine_halt();
 }
@@ -697,6 +701,7 @@ void kernel_power_off(void)
 	migrate_to_reboot_cpu();
 	syscore_shutdown();
 	pr_emerg("Power down\n");
+	lkm_checkpoints_dump();
 	kmsg_dump(KMSG_DUMP_SHUTDOWN);
 	machine_power_off();
 }

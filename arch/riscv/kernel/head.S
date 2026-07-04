@@ -5,6 +5,7 @@
 
 #include <asm/asm-offsets.h>
 #include <asm/asm.h>
+#include <linux/lkm_checkpoints.h>
 #include <linux/init.h>
 #include <linux/linkage.h>
 #include <asm/thread_info.h>
@@ -16,6 +17,35 @@
 #include <asm/scs.h>
 #include <asm/xip_fixup.h>
 #include "efi-header.S"
+
+#ifdef CONFIG_LKM_CHECKPOINTS
+.macro LKM_RUNTIME_CHECKPOINT checkpoint_id
+	la t4, lkm_checkpoint_count
+	REG_L t5, 0(t4)
+	addi t6, t5, 1
+	REG_S t6, 0(t4)
+	li t6, LKM_CHECKPOINT_BUFFER_CAPACITY
+	bgeu t5, t6, .L_lkm_checkpoint_overflow\@
+	la t6, lkm_checkpoint_events
+	add t6, t6, t5
+	li t4, \checkpoint_id
+	sb t4, 0(t6)
+	j .L_lkm_checkpoint_done\@
+.L_lkm_checkpoint_overflow\@:
+	la t4, lkm_checkpoint_overflow
+	li t6, 1
+	sw t6, 0(t4)
+	la t4, lkm_checkpoint_dropped
+	REG_L t5, 0(t4)
+	addi t5, t5, 1
+	REG_S t5, 0(t4)
+.L_lkm_checkpoint_done\@:
+	.balign 4
+.endm
+#else
+.macro LKM_RUNTIME_CHECKPOINT checkpoint_id
+.endm
+#endif
 
 __HEAD
 /* LKM_CHECKPOINT name=EntryPreludePhase.Started variant=EntryPreludePhaseStarted fingerprint=sha256:a6b14a3fc2e8707e6fd99b5c9b71e4515818c83b6fd7e337f7fbe73295ebb179 */
@@ -104,6 +134,7 @@ relocate_enable_mmu:
 	srl a0, a0, PAGE_SHIFT
 	or a0, a0, a1
 	sfence.vma
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_TRAMPOLINE_VM_ONLINE
 	/* LKM_CHECKPOINT name=TrampolineVm.Online variant=TrampolineVmOnline fingerprint=sha256:21f29d6a622a89fdfa1cb048c3bee02e79cb822bc9123e2f414f5a7e4525f2a7 */
 	csrw CSR_SATP, a0
 .align 2
@@ -125,6 +156,8 @@ relocate_enable_mmu:
 	/* LKM_CHECKPOINT name=EarlyVm.Online variant=EarlyVmOnline fingerprint=sha256:a6c18ae723f71bc365b8b970d16f0fa18bf47b973b95e592dd0234545aba90cb */
 	csrw CSR_SATP, a2
 	sfence.vma
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_KERNEL_IMAGE_ONLINE
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EARLY_VM_ONLINE
 
 	ret
 #endif /* CONFIG_MMU */
@@ -188,6 +221,8 @@ secondary_start_sbi:
 	/* Set trap vector to exception handler */
 	/* LKM_CHECKPOINT name=EventStream.Ready variant=EventStreamReady fingerprint=sha256:73984e9dbc51a745cb111d4e6cf9494f4485104d99407371c2eac30db61239e3 */
 	/* LKM_CHECKPOINT name=ExceptionStream.Ready variant=ExceptionStreamReady fingerprint=sha256:73984e9dbc51a745cb111d4e6cf9494f4485104d99407371c2eac30db61239e3 */
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EVENT_STREAM_READY
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EXCEPTION_STREAM_READY
 	la a0, handle_exception
 	csrw CSR_TVEC, a0
 
@@ -202,6 +237,7 @@ SYM_CODE_END(_start)
 
 SYM_CODE_START(_start_kernel)
 	/* Mask all interrupts */
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_ENTRY_PRELUDE_PHASE_STARTED
 	csrw CSR_IE, zero
 	csrw CSR_IP, zero
 
@@ -315,6 +351,8 @@ SYM_CODE_START(_start_kernel)
 	la a3, .Lsecondary_park
 	/* LKM_CHECKPOINT name=EventStream.Prepared variant=EventStreamPrepared fingerprint=sha256:863decfd3ccdff59528c0003641e490518ba33adbb26efb777ec3fb97406ef6e */
 	/* LKM_CHECKPOINT name=ExceptionStream.Prepared variant=ExceptionStreamPrepared fingerprint=sha256:863decfd3ccdff59528c0003641e490518ba33adbb26efb777ec3fb97406ef6e */
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EVENT_STREAM_PREPARED
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EXCEPTION_STREAM_PREPARED
 	csrw CSR_TVEC, a3
 	call setup_vm
 #ifdef CONFIG_MMU
@@ -335,6 +373,7 @@ SYM_CODE_START(_start_kernel)
 #endif
 	/* Start the kernel */
 	call soc_early_init
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_ENTRY_PRELUDE_PHASE_READY
 	/* LKM_CHECKPOINT name=EntryPreludePhase.Ready variant=EntryPreludePhaseReady fingerprint=sha256:5ecb990a05c54bab19008411bb0c460ff7a4a2744d65387556a504e38cc7159e */
 	tail start_kernel
 
@@ -368,6 +407,25 @@ SYM_CODE_START(_start_kernel)
 #endif /* CONFIG_RISCV_BOOT_SPINWAIT */
 
 SYM_CODE_END(_start_kernel)
+
+#ifdef CONFIG_LKM_CHECKPOINTS
+.pushsection .data, "aw"
+.balign RISCV_SZPTR
+.global lkm_checkpoint_count
+lkm_checkpoint_count:
+	RISCV_PTR 0
+.global lkm_checkpoint_dropped
+lkm_checkpoint_dropped:
+	RISCV_PTR 0
+.global lkm_checkpoint_overflow
+lkm_checkpoint_overflow:
+	.word 0
+.balign RISCV_SZPTR
+.global lkm_checkpoint_events
+lkm_checkpoint_events:
+	.zero LKM_CHECKPOINT_BUFFER_CAPACITY
+.popsection
+#endif
 
 #ifdef CONFIG_RISCV_M_MODE
 SYM_CODE_START_LOCAL(reset_regs)

@@ -16,6 +16,7 @@
 #include <linux/kmsg_dump.h>
 #include <linux/kallsyms.h>
 #include <linux/notifier.h>
+#include <linux/lkm_checkpoints.h>
 #include <linux/vt_kern.h>
 #include <linux/module.h>
 #include <linux/random.h>
@@ -346,6 +347,7 @@ void panic(const char *fmt, ...)
 		buf[len - 1] = '\0';
 
 	pr_emerg("Kernel panic - not syncing: %s\n", buf);
+	lkm_checkpoints_dump();
 #ifdef CONFIG_DEBUG_BUGVERBOSE
 	/*
 	 * Avoid nested stack-dumping if a panic occurs during oops processing
