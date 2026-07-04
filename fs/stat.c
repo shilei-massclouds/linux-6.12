@@ -19,6 +19,7 @@
 #include <linux/pagemap.h>
 #include <linux/compat.h>
 #include <linux/iversion.h>
+#include <linux/lkm_checkpoints.h>
 
 #include <linux/uaccess.h>
 #include <asm/unistd.h>
@@ -503,6 +504,7 @@ SYSCALL_DEFINE4(newfstatat, int, dfd, const char __user *, filename,
 	int error;
 
 	/* LKM_CHECKPOINT name=SyscallTable.NewFstatAt variant=SyscallTableNewFstatAt fingerprint=sha256:92fad3c308a8b4e87fba011bd2c3f0e883bc482e58d4e853fdf12ccf8985e861 */
+	lkm_checkpoint_record(LKM_CHECKPOINT_SYSCALL_TABLE_NEW_FSTAT_AT);
 	error = vfs_fstatat(dfd, filename, &stat, flag);
 	if (error)
 		return error;

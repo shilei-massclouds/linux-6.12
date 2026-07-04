@@ -16,6 +16,7 @@
 #include <linux/ptrace.h>
 #include <linux/uaccess.h>
 #include <linux/personality.h>
+#include <linux/lkm_checkpoints.h>
 
 #include <asm/unistd.h>
 #include <asm/processor.h>
@@ -149,6 +150,7 @@ void start_thread(struct pt_regs *regs, unsigned long pc,
 		fstate_restore(current, regs);
 	}
 	/* LKM_CHECKPOINT name=UserExec.TrapFrameReady variant=UserExecTrapFrameReady fingerprint=sha256:24ef597d20f2af8416983b020dd49bf0705b28e8a0fe067fe20b5280034c6d8d */
+	lkm_checkpoint_record(LKM_CHECKPOINT_USER_EXEC_TRAP_FRAME_READY);
 	regs->epc = pc;
 	regs->sp = sp;
 

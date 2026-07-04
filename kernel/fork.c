@@ -103,6 +103,7 @@
 #include <linux/user_events.h>
 #include <linux/iommu.h>
 #include <linux/rseq.h>
+#include <linux/lkm_checkpoints.h>
 #include <uapi/linux/pidfd.h>
 #include <linux/pidfs.h>
 #include <linux/tick.h>
@@ -1920,6 +1921,7 @@ static void copy_seccomp(struct task_struct *p)
 SYSCALL_DEFINE1(set_tid_address, int __user *, tidptr)
 {
 	/* LKM_CHECKPOINT name=SyscallTable.SetTidAddress variant=SyscallTableSetTidAddress fingerprint=sha256:7d7706e14dcb544d203c69537d2902e8282a18905a33a02b20b5ac612724408e */
+	lkm_checkpoint_record(LKM_CHECKPOINT_SYSCALL_TABLE_SET_TID_ADDRESS);
 	current->clear_child_tid = tidptr;
 
 	return task_pid_vnr(current);
@@ -2785,6 +2787,7 @@ pid_t kernel_clone(struct kernel_clone_args *args)
 	}
 
 	/* LKM_CHECKPOINT name=SyscallTable.Clone variant=SyscallTableClone fingerprint=sha256:c4bdc67063c7c38c2a9ff89eabef84cc7ca8286d110d0dc681e56a063e398bff */
+	lkm_checkpoint_record(LKM_CHECKPOINT_SYSCALL_TABLE_CLONE);
 	p = copy_process(NULL, trace, NUMA_NO_NODE, args);
 	add_latent_entropy();
 

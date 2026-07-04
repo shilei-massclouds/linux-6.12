@@ -54,6 +54,7 @@
 #include <linux/fs_struct.h>
 #include <linux/init_task.h>
 #include <linux/perf_event.h>
+#include <linux/lkm_checkpoints.h>
 #include <trace/events/sched.h>
 #include <linux/hw_breakpoint.h>
 #include <linux/oom.h>
@@ -1086,6 +1087,7 @@ do_group_exit(int exit_code)
 	}
 
 	/* LKM_CHECKPOINT name=SyscallTable.Exit variant=SyscallTableExit fingerprint=sha256:71e7f8adff875cc351cc7490c5b46ebe6a5f84fbe8bc61a6834ab11dac40f705 */
+	lkm_checkpoint_record(LKM_CHECKPOINT_SYSCALL_TABLE_EXIT);
 	do_exit(exit_code);
 	/* NOTREACHED */
 }
@@ -1852,6 +1854,7 @@ long kernel_wait4(pid_t upid, int __user *stat_addr, int options,
 	ret = do_wait(&wo);
 	put_pid(pid);
 	/* LKM_CHECKPOINT name=UserChild.ParentWaitResumed variant=UserChildParentWaitResumed fingerprint=sha256:f59455758ea844d2ff8d6d95109a70ee4de1f4e90d1d7959792b73943146d908 */
+	lkm_checkpoint_record(LKM_CHECKPOINT_USER_CHILD_PARENT_WAIT_RESUMED);
 	if (ret > 0 && stat_addr && put_user(wo.wo_stat, stat_addr))
 		ret = -EFAULT;
 
@@ -1879,6 +1882,7 @@ SYSCALL_DEFINE4(wait4, pid_t, upid, int __user *, stat_addr,
 {
 	struct rusage r;
 	/* LKM_CHECKPOINT name=SyscallTable.Wait4 variant=SyscallTableWait4 fingerprint=sha256:92549b5d721968fa29152fb2746347e9f8866c16a82bf68bcc565087909aba19 */
+	lkm_checkpoint_record(LKM_CHECKPOINT_SYSCALL_TABLE_WAIT4);
 	long err = kernel_wait4(upid, stat_addr, options, ru ? &r : NULL);
 
 	if (err > 0) {

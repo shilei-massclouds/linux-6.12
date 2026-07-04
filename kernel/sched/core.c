@@ -37,6 +37,7 @@
 #include <linux/sched/nohz.h>
 #include <linux/sched/rseq_api.h>
 #include <linux/sched/rt.h>
+#include <linux/lkm_checkpoints.h>
 
 #include <linux/blkdev.h>
 #include <linux/context_tracking.h>
@@ -8366,6 +8367,7 @@ static struct kmem_cache *task_group_cache __ro_after_init;
 /* LKM_CHECKPOINT name=SchedInitPhase.Ready variant=SchedInitPhaseReady fingerprint=sha256:578645dbec38a8bb135a0e2a8decf9917cf18b07a549c8c38f6000378f68cbc6 */
 void __init sched_init(void)
 {
+	lkm_checkpoint_record(LKM_CHECKPOINT_SCHED_INIT_PHASE_READY);
 	unsigned long ptr = 0;
 	int i;
 

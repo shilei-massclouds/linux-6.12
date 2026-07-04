@@ -30,6 +30,7 @@
 #include <linux/crash_dump.h>
 #include <linux/execmem.h>
 #include <linux/vmstat.h>
+#include <linux/lkm_checkpoints.h>
 #include "internal.h"
 #include "slab.h"
 #include "shuffle.h"
@@ -2636,6 +2637,7 @@ static void __init mem_init_print_info(void)
 /* LKM_CHECKPOINT name=MmCoreInitPhase.Ready variant=MmCoreInitPhaseReady fingerprint=sha256:775a8457864c3f955739c84f2b54ce1085e272a13f34e2ed270b86d8e7ee9623 */
 void __init mm_core_init(void)
 {
+	lkm_checkpoint_record(LKM_CHECKPOINT_MM_CORE_INIT_PHASE_READY);
 	/* Initializations relying on SMP setup */
 	BUILD_BUG_ON(MAX_ZONELISTS > 2);
 	build_all_zonelists(NULL);

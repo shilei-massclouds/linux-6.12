@@ -19,6 +19,7 @@
 #include <linux/ramfs.h>
 #include <linux/shmem_fs.h>
 #include <linux/ktime.h>
+#include <linux/lkm_checkpoints.h>
 
 #include <linux/nfs_fs.h>
 #include <linux/nfs_fs_sb.h>
@@ -464,6 +465,7 @@ static dev_t __init parse_root_device(char *root_device_name)
 /* LKM_CHECKPOINT name=RootfsPhase.Ready variant=RootfsPhaseReady fingerprint=sha256:98be793b382949218fe97ea7d3d5df8680708b264112f80d9bdf8ead3436cae1 */
 void __init prepare_namespace(void)
 {
+	lkm_checkpoint_record(LKM_CHECKPOINT_ROOTFS_PHASE_READY);
 	if (root_delay) {
 		printk(KERN_INFO "Waiting %d sec before mounting root device...\n",
 		       root_delay);
@@ -494,6 +496,7 @@ out:
 	devtmpfs_mount();
 	init_mount(".", "/", NULL, MS_MOVE, NULL);
 	/* LKM_CHECKPOINT name=RootFS.Online variant=RootFSOnline fingerprint=sha256:c39f9cc12ad3fe2ac53973278e05fca78b2dcccebaf0e9d3935ea4d1ecd32243 */
+	lkm_checkpoint_record(LKM_CHECKPOINT_ROOT_FSONLINE);
 	init_chroot(".");
 }
 

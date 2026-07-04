@@ -20,6 +20,7 @@
 #include <linux/compat.h>
 #include <linux/mount.h>
 #include <linux/fs.h>
+#include <linux/lkm_checkpoints.h>
 #include "internal.h"
 
 #include <linux/uaccess.h>
@@ -720,6 +721,7 @@ ssize_t ksys_read(unsigned int fd, char __user *buf, size_t count)
 SYSCALL_DEFINE3(read, unsigned int, fd, char __user *, buf, size_t, count)
 {
 	/* LKM_CHECKPOINT name=SyscallTable.Read variant=SyscallTableRead fingerprint=sha256:9b89d40103c018476fdc5ed63447c311ebeaf9e78905b64bdacafe82e25c72a4 */
+	lkm_checkpoint_record(LKM_CHECKPOINT_SYSCALL_TABLE_READ);
 	return ksys_read(fd, buf, count);
 }
 
@@ -747,6 +749,7 @@ SYSCALL_DEFINE3(write, unsigned int, fd, const char __user *, buf,
 		size_t, count)
 {
 	/* LKM_CHECKPOINT name=SyscallTable.Write variant=SyscallTableWrite fingerprint=sha256:6dd6150566c4a1cdd4f919a8fb6c1ccab4f82c38b923a1c48fa0f3e2969e2e07 */
+	lkm_checkpoint_record(LKM_CHECKPOINT_SYSCALL_TABLE_WRITE);
 	return ksys_write(fd, buf, count);
 }
 
@@ -1184,6 +1187,7 @@ SYSCALL_DEFINE3(writev, unsigned long, fd, const struct iovec __user *, vec,
 		unsigned long, vlen)
 {
 	/* LKM_CHECKPOINT name=SyscallTable.Writev variant=SyscallTableWritev fingerprint=sha256:0284519ade08dbce46873d93989013114df0b03ccd47e56e4e02d6a9205e192b */
+	lkm_checkpoint_record(LKM_CHECKPOINT_SYSCALL_TABLE_WRITEV);
 	return do_writev(fd, vec, vlen, 0);
 }
 
