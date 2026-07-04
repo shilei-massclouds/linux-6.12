@@ -1085,6 +1085,7 @@ do_group_exit(int exit_code)
 		spin_unlock_irq(&sighand->siglock);
 	}
 
+	/* LKM_CHECKPOINT name=SyscallTable.Exit variant=SyscallTableExit fingerprint=sha256:71e7f8adff875cc351cc7490c5b46ebe6a5f84fbe8bc61a6834ab11dac40f705 */
 	do_exit(exit_code);
 	/* NOTREACHED */
 }
@@ -1850,6 +1851,7 @@ long kernel_wait4(pid_t upid, int __user *stat_addr, int options,
 	wo.wo_rusage	= ru;
 	ret = do_wait(&wo);
 	put_pid(pid);
+	/* LKM_CHECKPOINT name=UserChild.ParentWaitResumed variant=UserChildParentWaitResumed fingerprint=sha256:f59455758ea844d2ff8d6d95109a70ee4de1f4e90d1d7959792b73943146d908 */
 	if (ret > 0 && stat_addr && put_user(wo.wo_stat, stat_addr))
 		ret = -EFAULT;
 
@@ -1876,6 +1878,7 @@ SYSCALL_DEFINE4(wait4, pid_t, upid, int __user *, stat_addr,
 		int, options, struct rusage __user *, ru)
 {
 	struct rusage r;
+	/* LKM_CHECKPOINT name=SyscallTable.Wait4 variant=SyscallTableWait4 fingerprint=sha256:92549b5d721968fa29152fb2746347e9f8866c16a82bf68bcc565087909aba19 */
 	long err = kernel_wait4(upid, stat_addr, options, ru ? &r : NULL);
 
 	if (err > 0) {

@@ -987,6 +987,7 @@ static void __init create_fdt_early_page_table(uintptr_t fix_fdt_va,
 	dtb_early_va = kernel_mapping_pa_to_va(dtb_pa);
 #endif
 
+	/* LKM_CHECKPOINT name=RawDtb.Ready variant=RawDtbReady fingerprint=sha256:b6b96be73768abfbe304055b32c13b8bc792ec46ef6cf37a83fd98af114e0aaf */
 	dtb_early_pa = dtb_pa;
 }
 
@@ -1204,9 +1205,11 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 	 * us to reach paging_init(). We map all memory banks later
 	 * in setup_vm_final() below.
 	 */
+	/* LKM_CHECKPOINT name=EarlyVm.Ready variant=EarlyVmReady fingerprint=sha256:e46b47732d34e5841a872c945de1d40d11c12b84838462120f3ddb63889aac52 */
 	create_kernel_page_table(early_pg_dir, true);
 
 	/* Setup early mapping for FDT early scan */
+	/* LKM_CHECKPOINT name=RawDtb.Prepared variant=RawDtbPrepared fingerprint=sha256:2f6e77a3f8b44c0c404131469d0ee0087cbbb581a0a43a807812f58fe84dc618 */
 	create_fdt_early_page_table(__fix_to_virt(FIX_FDT), dtb_pa);
 
 	/*

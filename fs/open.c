@@ -1443,6 +1443,7 @@ SYSCALL_DEFINE4(openat, int, dfd, const char __user *, filename, int, flags,
 {
 	if (force_o_largefile())
 		flags |= O_LARGEFILE;
+	/* LKM_CHECKPOINT name=SyscallTable.OpenAt variant=SyscallTableOpenAt fingerprint=sha256:45c1d50b119fc8cd6e1bfe0700bd871344a128edd42b46fbddf569be25ff832e */
 	return do_sys_open(dfd, filename, flags, mode);
 }
 
@@ -1554,6 +1555,7 @@ SYSCALL_DEFINE1(close, unsigned int, fd)
 	int retval;
 	struct file *file;
 
+	/* LKM_CHECKPOINT name=SyscallTable.Close variant=SyscallTableClose fingerprint=sha256:119433103f6272bcb24489f95afbaf8a8ef9a4c2f03205c3498167a09e89259f */
 	file = file_close_fd(fd);
 	if (!file)
 		return -EBADF;

@@ -461,6 +461,7 @@ static dev_t __init parse_root_device(char *root_device_name)
 /*
  * Prepare the namespace - decide what/where to mount, load ramdisks, etc.
  */
+/* LKM_CHECKPOINT name=RootfsPhase.Ready variant=RootfsPhaseReady fingerprint=sha256:98be793b382949218fe97ea7d3d5df8680708b264112f80d9bdf8ead3436cae1 */
 void __init prepare_namespace(void)
 {
 	if (root_delay) {
@@ -492,6 +493,7 @@ void __init prepare_namespace(void)
 out:
 	devtmpfs_mount();
 	init_mount(".", "/", NULL, MS_MOVE, NULL);
+	/* LKM_CHECKPOINT name=RootFS.Online variant=RootFSOnline fingerprint=sha256:c39f9cc12ad3fe2ac53973278e05fca78b2dcccebaf0e9d3935ea4d1ecd32243 */
 	init_chroot(".");
 }
 

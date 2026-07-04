@@ -2633,6 +2633,7 @@ static void __init mem_init_print_info(void)
 /*
  * Set up kernel memory allocators
  */
+/* LKM_CHECKPOINT name=MmCoreInitPhase.Ready variant=MmCoreInitPhaseReady fingerprint=sha256:775a8457864c3f955739c84f2b54ce1085e272a13f34e2ed270b86d8e7ee9623 */
 void __init mm_core_init(void)
 {
 	/* Initializations relying on SMP setup */

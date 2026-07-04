@@ -852,6 +852,8 @@ static int load_elf_binary(struct linux_binprm *bprm)
 	if (!bprm->file->f_op->mmap)
 		goto out;
 
+	/* LKM_CHECKPOINT name=UserBoot.MainElfReady variant=UserBootMainElfReady fingerprint=sha256:70c7a48954553725b3dd6e1cd78f576a622a38c6f07a5ca250432c9981b36653 */
+	/* LKM_CHECKPOINT name=UserExec.MainElfReady variant=UserExecMainElfReady fingerprint=sha256:70c7a48954553725b3dd6e1cd78f576a622a38c6f07a5ca250432c9981b36653 */
 	elf_phdata = load_elf_phdrs(elf_ex, bprm->file);
 	if (!elf_phdata)
 		goto out;
@@ -952,6 +954,8 @@ out_free_interp:
 			goto out_free_dentry;
 
 		/* Load the interpreter program headers */
+		/* LKM_CHECKPOINT name=UserBoot.InterpreterReady variant=UserBootInterpreterReady fingerprint=sha256:91cca162296f4afdd0504ffb586f55efaa5b012ac2438a5a0339885b02e2b373 */
+		/* LKM_CHECKPOINT name=UserExec.InterpreterReady variant=UserExecInterpreterReady fingerprint=sha256:91cca162296f4afdd0504ffb586f55efaa5b012ac2438a5a0339885b02e2b373 */
 		interp_elf_phdata = load_elf_phdrs(interp_elf_ex,
 						   interpreter);
 		if (!interp_elf_phdata)
@@ -993,6 +997,7 @@ out_free_interp:
 		goto out_free_dentry;
 
 	/* Flush all traces of the currently running executable */
+	/* LKM_CHECKPOINT name=UserBoot.AddressSpaceSetupStart variant=UserBootAddressSpaceSetupStart fingerprint=sha256:ab2cc91a9abd25c39e3da418d8678e7581e123de06b320ae20026134c5df01af */
 	retval = begin_new_exec(bprm);
 	if (retval)
 		goto out_free_dentry;

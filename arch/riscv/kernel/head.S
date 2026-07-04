@@ -18,6 +18,7 @@
 #include "efi-header.S"
 
 __HEAD
+/* LKM_CHECKPOINT name=EntryPreludePhase.Started variant=EntryPreludePhaseStarted fingerprint=sha256:a6b14a3fc2e8707e6fd99b5c9b71e4515818c83b6fd7e337f7fbe73295ebb179 */
 SYM_CODE_START(_start)
 	/*
 	 * Image header expected by Linux boot-loaders. The image header data
@@ -103,6 +104,7 @@ relocate_enable_mmu:
 	srl a0, a0, PAGE_SHIFT
 	or a0, a0, a1
 	sfence.vma
+	/* LKM_CHECKPOINT name=TrampolineVm.Online variant=TrampolineVmOnline fingerprint=sha256:21f29d6a622a89fdfa1cb048c3bee02e79cb822bc9123e2f414f5a7e4525f2a7 */
 	csrw CSR_SATP, a0
 .align 2
 1:
@@ -111,6 +113,7 @@ relocate_enable_mmu:
 	csrw CSR_TVEC, a0
 
 	/* Reload the global pointer */
+	/* LKM_CHECKPOINT name=KernelImage.Online variant=KernelImageOnline fingerprint=sha256:92093ea32ea3ea091c0b75b6116558b1873a315b8d1eb4a202c4b1b14e832467 */
 	load_global_pointer
 
 	/*
@@ -119,6 +122,7 @@ relocate_enable_mmu:
 	 * the first superpage.  Fetching the fence is guaranteed to work
 	 * because that first superpage is translated the same way.
 	 */
+	/* LKM_CHECKPOINT name=EarlyVm.Online variant=EarlyVmOnline fingerprint=sha256:a6c18ae723f71bc365b8b970d16f0fa18bf47b973b95e592dd0234545aba90cb */
 	csrw CSR_SATP, a2
 	sfence.vma
 
@@ -182,6 +186,8 @@ secondary_start_sbi:
 .align 2
 .Lsetup_trap_vector:
 	/* Set trap vector to exception handler */
+	/* LKM_CHECKPOINT name=EventStream.Ready variant=EventStreamReady fingerprint=sha256:73984e9dbc51a745cb111d4e6cf9494f4485104d99407371c2eac30db61239e3 */
+	/* LKM_CHECKPOINT name=ExceptionStream.Ready variant=ExceptionStreamReady fingerprint=sha256:73984e9dbc51a745cb111d4e6cf9494f4485104d99407371c2eac30db61239e3 */
 	la a0, handle_exception
 	csrw CSR_TVEC, a0
 
@@ -307,6 +313,8 @@ SYM_CODE_START(_start_kernel)
 #endif /* CONFIG_BUILTIN_DTB */
 	/* Set trap vector to spin forever to help debug */
 	la a3, .Lsecondary_park
+	/* LKM_CHECKPOINT name=EventStream.Prepared variant=EventStreamPrepared fingerprint=sha256:863decfd3ccdff59528c0003641e490518ba33adbb26efb777ec3fb97406ef6e */
+	/* LKM_CHECKPOINT name=ExceptionStream.Prepared variant=ExceptionStreamPrepared fingerprint=sha256:863decfd3ccdff59528c0003641e490518ba33adbb26efb777ec3fb97406ef6e */
 	csrw CSR_TVEC, a3
 	call setup_vm
 #ifdef CONFIG_MMU
@@ -327,6 +335,7 @@ SYM_CODE_START(_start_kernel)
 #endif
 	/* Start the kernel */
 	call soc_early_init
+	/* LKM_CHECKPOINT name=EntryPreludePhase.Ready variant=EntryPreludePhaseReady fingerprint=sha256:5ecb990a05c54bab19008411bb0c460ff7a4a2744d65387556a504e38cc7159e */
 	tail start_kernel
 
 #ifdef CONFIG_RISCV_BOOT_SPINWAIT

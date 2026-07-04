@@ -698,6 +698,7 @@ static void __init setup_command_line(char *command_line)
 
 static __initdata DECLARE_COMPLETION(kthreadd_done);
 
+/* LKM_CHECKPOINT name=BootInitRestInitPhase.Ready variant=BootInitRestInitPhaseReady fingerprint=sha256:1273e1d2c8aa4180861ca736f457914606e649c85f98bbb107ff883c0ba5ed30 */
 static noinline void __ref __noreturn rest_init(void)
 {
 	struct task_struct *tsk;
@@ -900,6 +901,7 @@ static void __init early_numa_node_init(void)
 }
 
 asmlinkage __visible __init __no_sanitize_address __noreturn __no_stack_protector
+/* LKM_CHECKPOINT name=StartupTimeline.Started variant=StartupTimelineStarted fingerprint=sha256:157e6bf6ecd4ba00cd50b5e0ca62ec6a68da217256432e23ceb379c27df14abc */
 void start_kernel(void)
 {
 	char *command_line;
@@ -922,6 +924,7 @@ void start_kernel(void)
 	boot_cpu_init();
 	page_address_init();
 	pr_notice("%s", linux_banner);
+	/* LKM_CHECKPOINT name=CorePreparePhase.Started variant=CorePreparePhaseStarted fingerprint=sha256:10e9e0f1a53639fedf6f4bedb5982f76fe2ece2fb13242af3ac443e60043c248 */
 	setup_arch(&command_line);
 	/* Static keys and static calls are needed by LSMs */
 	jump_label_init();
@@ -960,7 +963,9 @@ void start_kernel(void)
 	setup_log_buf(0);
 	vfs_caches_init_early();
 	sort_main_extable();
+	/* LKM_CHECKPOINT name=CorePreparePhase.Ready variant=CorePreparePhaseReady fingerprint=sha256:37892ee857657d9ef3016c193b36096e02ecfd85b97751e280cc267f4a897168 */
 	trap_init();
+	/* LKM_CHECKPOINT name=MmCoreInitPhase.Started variant=MmCoreInitPhaseStarted fingerprint=sha256:2be71d725747f29ee3c3c47fcb7f4ed459a30cc9014c5b72a7df8066d76a3332 */
 	mm_core_init();
 	poking_init();
 	ftrace_init();
@@ -973,6 +978,7 @@ void start_kernel(void)
 	 * timer interrupt). Full topology setup happens at smp_init()
 	 * time - but meanwhile we still have a functioning scheduler.
 	 */
+	/* LKM_CHECKPOINT name=SchedInitPhase.Started variant=SchedInitPhaseStarted fingerprint=sha256:e2baa98bf9e8dedd58b918e496d1515fed8c15341e6f89b3f7602545b153c05e */
 	sched_init();
 
 	if (WARN(!irqs_disabled(),
@@ -1004,6 +1010,7 @@ void start_kernel(void)
 
 	context_tracking_init();
 	/* init some links before init_ISA_irqs() */
+	/* LKM_CHECKPOINT name=IrqTimeInitPhase.Started variant=IrqTimeInitPhaseStarted fingerprint=sha256:c73bd68617c1a8d6e37cadeaa506209b7eb6ef39b0973f7e3ab9dd4f14fdab14 */
 	early_irq_init();
 	init_IRQ();
 	tick_init();
@@ -1027,7 +1034,9 @@ void start_kernel(void)
 	call_function_init();
 	WARN(!irqs_disabled(), "Interrupts were enabled early\n");
 
+	/* LKM_CHECKPOINT name=LocalIrqEnablePhase.Started variant=LocalIrqEnablePhaseStarted fingerprint=sha256:8604f32a56db71fe0f325700c72a3236c018918236bdc56b603c9d01b6594b90 */
 	early_boot_irqs_disabled = false;
+	/* LKM_CHECKPOINT name=LocalIrqEnablePhase.Ready variant=LocalIrqEnablePhaseReady fingerprint=sha256:f6fde6368f55a1fe8dde26f41c73aebaa3210e1e08ecf602f5a69acdab9642b6 */
 	local_irq_enable();
 
 	kmem_cache_init_late();
@@ -1070,6 +1079,7 @@ void start_kernel(void)
 
 	arch_cpu_finalize_init();
 
+	/* LKM_CHECKPOINT name=ProcessPreparePhase.Started variant=ProcessPreparePhaseStarted fingerprint=sha256:040c8fb7842c4e5d9d99ace72823a83ca9ffd03a4a32763b885d182232e8b6d0 */
 	pid_idr_init();
 	anon_vma_init();
 #ifdef CONFIG_X86
@@ -1359,10 +1369,17 @@ static void __init do_initcalls(void)
  */
 static void __init do_basic_setup(void)
 {
+	/* LKM_CHECKPOINT name=CpusetSmp.TrimmedReady variant=CpusetSmpTrimmedReady fingerprint=sha256:88e8287947ca8e2620b48e3a79ac1ae12371120f602b72da3ed2a4d2b6e39dd6 */
 	cpuset_init_smp();
+	/* LKM_CHECKPOINT name=DriverCore.DeferredReady variant=DriverCoreDeferredReady fingerprint=sha256:0e34c050b69a9ebc028c4395576a76b82b082f2f820fbad2b026c29478f656b4 */
 	driver_init();
+	/* LKM_CHECKPOINT name=IrqProcView.DeferredReady variant=IrqProcViewDeferredReady fingerprint=sha256:92e6a1b81dd05d0e2715ef0e2985625b6b09475dc5e2a34d832aaba70b315fd7 */
 	init_irq_proc();
+	/* LKM_CHECKPOINT name=CtorTable.Ready variant=CtorTableReady fingerprint=sha256:1839c71bfc9e4eea5b66a9a7fb77a6d5563846fa596a35673c1d10a4f36577ef */
 	do_ctors();
+	/* LKM_CHECKPOINT name=InitcallPhase.Ready variant=InitcallPhaseReady fingerprint=sha256:1f620492b8c34214aec73a0840bf92bd8c15ee94293f6710d094cc427330bf3c */
+	/* LKM_CHECKPOINT name=InitcallTable.Ready variant=InitcallTableReady fingerprint=sha256:1f620492b8c34214aec73a0840bf92bd8c15ee94293f6710d094cc427330bf3c */
+	/* LKM_CHECKPOINT name=InitcallBoundary.Ready variant=InitcallBoundaryReady fingerprint=sha256:1f620492b8c34214aec73a0840bf92bd8c15ee94293f6710d094cc427330bf3c */
 	do_initcalls();
 }
 
@@ -1468,27 +1485,39 @@ static int __ref kernel_init(void *unused)
 
 	kernel_init_freeable();
 	/* need to finish all async __init code before freeing the memory */
+	/* LKM_CHECKPOINT name=FinalizePhase.Started variant=FinalizePhaseStarted fingerprint=sha256:0085888a907a865e672fe2004f31a3f24eab4eec946f4d7330f652fae11e9767 */
+	/* LKM_CHECKPOINT name=AsyncFullSync.DeferredReady variant=AsyncFullSyncDeferredReady fingerprint=sha256:0085888a907a865e672fe2004f31a3f24eab4eec946f4d7330f652fae11e9767 */
 	async_synchronize_full();
 
+	/* LKM_CHECKPOINT name=SystemState.FreeingInitmemCheckpoint variant=SystemStateFreeingInitmemCheckpoint fingerprint=sha256:c6210996c4f1110405f43f1e2a19e791a0148b4a83b66dd8e583ccf7659538d5 */
 	system_state = SYSTEM_FREEING_INITMEM;
 	kprobe_free_init_mem();
 	ftrace_free_init_mem();
 	kgdb_free_init_mem();
 	exit_boot_config();
+	/* LKM_CHECKPOINT name=InitMemoryCleanup.DeferredReady variant=InitMemoryCleanupDeferredReady fingerprint=sha256:257f6af300289f4a9c2e70caac4917c22ea8487078db1d72a7318600fb3bf086 */
 	free_initmem();
+	/* LKM_CHECKPOINT name=KernelMappingProtection.DeferredReady variant=KernelMappingProtectionDeferredReady fingerprint=sha256:8e7e12d860f2644378518dee62c577088f0c88a21841aaea8294de37052fa726 */
 	mark_readonly();
 
 	/*
 	 * Kernel mappings are now finalized - update the userspace page-table
 	 * to finalize PTI.
 	 */
+	/* LKM_CHECKPOINT name=PtiFinalize.TrimmedReady variant=PtiFinalizeTrimmedReady fingerprint=sha256:d17b9c8edf829b56a26101c1762e0a99ccc355baf94b3668efed96c8816da034 */
 	pti_finalize();
 
+	/* LKM_CHECKPOINT name=FinalizePhase.Ready variant=FinalizePhaseReady fingerprint=sha256:61c2d0e700b81ddd6c819ec7fea9c0451b466d991533791158dd7ccc28af6416 */
+	/* LKM_CHECKPOINT name=SystemState.Online variant=SystemStateOnline fingerprint=sha256:61c2d0e700b81ddd6c819ec7fea9c0451b466d991533791158dd7ccc28af6416 */
 	system_state = SYSTEM_RUNNING;
 	numa_default_policy();
 
+	/* LKM_CHECKPOINT name=RcuCore.InkernelBootEnded variant=RcuInkernelBootEnded fingerprint=sha256:22a835032ccf00c19aeedfd3b5b930a5c44eb03b8692aa11b64e7f8eb5f38558 */
+	/* LKM_CHECKPOINT name=RcuBootEnd.Ready variant=RcuBootEndReady fingerprint=sha256:22a835032ccf00c19aeedfd3b5b930a5c44eb03b8692aa11b64e7f8eb5f38558 */
 	rcu_end_inkernel_boot();
 
+	/* LKM_CHECKPOINT name=SysctlArgs.DeferredReady variant=SysctlArgsDeferredReady fingerprint=sha256:f5f2e1079a8d270dad77c902a0fb62d625de4803905da5c7c92e34c0fa2a64fa */
+	/* LKM_CHECKPOINT name=PayloadPhase.Ready variant=PayloadPhaseReady fingerprint=sha256:f5f2e1079a8d270dad77c902a0fb62d625de4803905da5c7c92e34c0fa2a64fa */
 	do_sysctl_args();
 
 	if (ramdisk_execute_command) {
@@ -1522,6 +1551,7 @@ static int __ref kernel_init(void *unused)
 			return 0;
 	}
 
+	/* LKM_CHECKPOINT name=PayloadPhase.Online variant=PayloadPhaseOnline fingerprint=sha256:e00e7171e78e8e3250b0da24ae019fd51af8b634105d2e403636a2428b54b49f */
 	if (!try_to_run_init_process("/sbin/init") ||
 	    !try_to_run_init_process("/etc/init") ||
 	    !try_to_run_init_process("/bin/init") ||
@@ -1559,6 +1589,7 @@ static noinline void __init kernel_init_freeable(void)
 
 	cad_pid = get_pid(task_pid(current));
 
+	/* LKM_CHECKPOINT name=PreSmpInitPhase.Started variant=PreSmpInitPhaseStarted fingerprint=sha256:2c2663d6dd4c6839112ac9e6043da2515d9ae9e4862acabd29fb5952d55a8325 */
 	smp_prepare_cpus(setup_max_cpus);
 
 	workqueue_init();
@@ -1569,27 +1600,42 @@ static noinline void __init kernel_init_freeable(void)
 	do_pre_smp_initcalls();
 	lockup_detector_init();
 
+	/* LKM_CHECKPOINT name=SmpBringupPhase.Started variant=SmpBringupPhaseStarted fingerprint=sha256:08d3be20bc3bd9f5c9141b5d44ade504b81e0f024e35ce7b4b8f10380445abfc */
 	smp_init();
+	/* LKM_CHECKPOINT name=SmpBringupPhase.Ready variant=SmpBringupPhaseReady fingerprint=sha256:675d01169b756a814d0e8fe57b9ad1c49594664305e8521af77e097e9f33c3bf */
+	/* LKM_CHECKPOINT name=Scheduler.SmpReady variant=SchedulerSmpReady fingerprint=sha256:675d01169b756a814d0e8fe57b9ad1c49594664305e8521af77e097e9f33c3bf */
 	sched_init_smp();
 
+	/* LKM_CHECKPOINT name=RuntimeCorePhase.Started variant=RuntimeCorePhaseStarted fingerprint=sha256:03dfeb8f64384687156aeddedf07992345fb047ee1f56b3abb305105a96fbd1d */
+	/* LKM_CHECKPOINT name=Workqueue.TopologyReady variant=WorkqueueTopologyReady fingerprint=sha256:03dfeb8f64384687156aeddedf07992345fb047ee1f56b3abb305105a96fbd1d */
 	workqueue_init_topology();
+	/* LKM_CHECKPOINT name=AsyncCore.DeferredReady variant=AsyncCoreDeferredReady fingerprint=sha256:61c13f44ed28517448e066192dd123eafb7c4e3c03735c68ab598e615b38ecda */
 	async_init();
+	/* LKM_CHECKPOINT name=PadataCore.DeferredReady variant=PadataCoreDeferredReady fingerprint=sha256:cd092461aec09389276bca53585579667144153842c7a6a7be6e94657ee9fec1 */
 	padata_init();
+	/* LKM_CHECKPOINT name=PageAllocator.LateReady variant=PageAllocatorLateReady fingerprint=sha256:b6e27c8b0efab2478a69dd1a1f756e259436731660b78074706e53d142afdd7e */
+	/* LKM_CHECKPOINT name=RuntimeCoreBoundary.Ready variant=RuntimeCoreBoundaryReady fingerprint=sha256:b6e27c8b0efab2478a69dd1a1f756e259436731660b78074706e53d142afdd7e */
 	page_alloc_init_late();
 
+	/* LKM_CHECKPOINT name=InitcallPhase.Started variant=InitcallPhaseStarted fingerprint=sha256:4d94f0c1455072ddf644def011d739e0e5475ccfae9693589ec0dbcfd018a61e */
 	do_basic_setup();
 
+	/* LKM_CHECKPOINT name=KUnitRuntime.TrimmedReady variant=KUnitRuntimeTrimmedReady fingerprint=sha256:3d33db533450fcce68e9b91ec9cdfbe64176119c483e3fa123bb8da7273f09d0 */
 	kunit_run_all_tests();
 
+	/* LKM_CHECKPOINT name=InitramfsSync.DeferredReady variant=InitramfsSyncDeferredReady fingerprint=sha256:0d95b2b8587641ec6a20555dfbc4898ff733a15ca6723f14dd15c47f5fdb68cf */
 	wait_for_initramfs();
+	/* LKM_CHECKPOINT name=RootfsConsole.DeferredReady variant=RootfsConsoleDeferredReady fingerprint=sha256:7317bda8223c00594a3b8f144274efcf7a2a226246ac3a37752b654cc9e5a77b */
 	console_on_rootfs();
 
 	/*
 	 * check if there is an early userspace init.  If yes, let it do all
 	 * the work
 	 */
+	/* LKM_CHECKPOINT name=RamdiskExecuteCommand.EaccessCheckpoint variant=RamdiskExecuteCommandEaccessCheckpoint fingerprint=sha256:53b87d9662a9719bf150645a0f7444016bc3614e63f3a5a55c3e850b9d9040bb */
 	if (init_eaccess(ramdisk_execute_command) != 0) {
 		ramdisk_execute_command = NULL;
+		/* LKM_CHECKPOINT name=RootfsPhase.Started variant=RootfsPhaseStarted fingerprint=sha256:40771e6159d99116aed1044932e4ac26854ff6484cd995c1380162fee3db40a4 */
 		prepare_namespace();
 	}
 
@@ -1602,5 +1648,7 @@ static noinline void __init kernel_init_freeable(void)
 	 * and default modules
 	 */
 
+	/* LKM_CHECKPOINT name=IntegrityKeys.DeferredReady variant=IntegrityKeysDeferredReady fingerprint=sha256:b4e4014e299a65d526136c65a06616f6271e3d5cdbab5103212e4f0a0daafd27 */
+	/* LKM_CHECKPOINT name=RootfsBoundary.Ready variant=RootfsBoundaryReady fingerprint=sha256:b4e4014e299a65d526136c65a06616f6271e3d5cdbab5103212e4f0a0daafd27 */
 	integrity_load_keys();
 }
