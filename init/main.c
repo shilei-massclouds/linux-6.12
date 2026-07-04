@@ -1565,6 +1565,7 @@ static int __ref kernel_init(void *unused)
 	 * trying to recover a really broken machine.
 	 */
 	if (execute_command) {
+		lkm_checkpoint_record(LKM_CHECKPOINT_PAYLOAD_PHASE_ONLINE);
 		ret = run_init_process(execute_command);
 		if (!ret)
 			return 0;
