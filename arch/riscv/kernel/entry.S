@@ -292,8 +292,19 @@ SYM_CODE_START_NOALIGN(ret_from_exception)
 	REG_L  a2, PT_EPC(sp)
 	REG_SC x0, a2, PT_EPC(sp)
 
+#ifdef CONFIG_LKM_CHECKPOINTS
+#ifndef CONFIG_RISCV_M_MODE
+	andi s0, a0, SR_SPP
+	bnez s0, .L_lkm_skip_user_return_checkpoints
 	/* LKM_CHECKPOINT name=UserExec.SatpSwitched variant=UserExecSatpSwitched fingerprint=sha256:c86192c80eef5c3dd657d0f3e3e42ef03ca1b38f251709dae1bc3b23f4d8398e */
 	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_USER_EXEC_SATP_SWITCHED
+	/* LKM_CHECKPOINT name=UserInitProcess.EnterUserMode variant=UserModeEntry fingerprint=sha256:4e123c759fc00f1992c0cd1da108bbd5e1bf5e43e54bd87da816ea2f0d44593b */
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_USER_MODE_ENTRY
+	/* LKM_CHECKPOINT name=UserExec.ReturnFrameReady variant=UserExecReturnFrameReady fingerprint=sha256:4e123c759fc00f1992c0cd1da108bbd5e1bf5e43e54bd87da816ea2f0d44593b */
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_USER_EXEC_RETURN_FRAME_READY
+.L_lkm_skip_user_return_checkpoints:
+#endif
+#endif
 	csrw CSR_STATUS, a0
 	csrw CSR_EPC, a2
 
@@ -308,10 +319,6 @@ SYM_CODE_START_NOALIGN(ret_from_exception)
 #ifdef CONFIG_RISCV_M_MODE
 	mret
 #else
-	/* LKM_CHECKPOINT name=UserInitProcess.EnterUserMode variant=UserModeEntry fingerprint=sha256:4e123c759fc00f1992c0cd1da108bbd5e1bf5e43e54bd87da816ea2f0d44593b */
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_USER_MODE_ENTRY
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_USER_EXEC_RETURN_FRAME_READY
-	/* LKM_CHECKPOINT name=UserExec.ReturnFrameReady variant=UserExecReturnFrameReady fingerprint=sha256:4e123c759fc00f1992c0cd1da108bbd5e1bf5e43e54bd87da816ea2f0d44593b */
 	sret
 #endif
 SYM_CODE_END(ret_from_exception)
