@@ -420,6 +420,10 @@ void cpu_startup_entry(enum cpuhp_state state)
 	current->flags |= PF_IDLE;
 	arch_cpu_idle_prepare();
 	cpuhp_online_idle(state);
+	/* LKM_CHECKPOINT name=ApOnlineIdlePhase.Ready variant=ApOnlineIdlePhaseReady fingerprint=sha256:967122ada57d057e4f24f256894e82a4bb987bd550080037488f61935acd0a4c */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+	lkm_checkpoint_record(LKM_CHECKPOINT_AP_ONLINE_IDLE_PHASE_READY);
+#endif
 	while (1)
 		do_idle();
 }

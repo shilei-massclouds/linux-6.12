@@ -164,6 +164,8 @@ relocate_enable_mmu:
 #ifdef CONFIG_SMP
 	.global secondary_start_sbi
 secondary_start_sbi:
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_AP_ENTRY_PRELUDE_PHASE_STARTED
+	/* LKM_CHECKPOINT name=ApEntryPreludePhase.Started variant=ApEntryPreludePhaseStarted fingerprint=sha256:5f815205add548595954767b8ec2ae0cb16a980971dc8dbb34c90d1044d5954b */
 	/* Mask all interrupts */
 	csrw CSR_IE, zero
 	csrw CSR_IP, zero
@@ -190,7 +192,9 @@ secondary_start_sbi:
 	li a3, SBI_HART_BOOT_STACK_PTR_OFFSET
 	XIP_FIXUP_OFFSET a3
 	add a3, a3, a1
+	/* LKM_CHECKPOINT name=ApEntryPreludePhase.CurrentStackEstablished variant=ApEntryPreludeCurrentStackEstablished fingerprint=sha256:2c173a00a78e2fa399e2de3aabf1767dd15e63b8fd3a6af16fa7ea2326ad2a94 */
 	REG_L sp, (a3)
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_AP_ENTRY_PRELUDE_PHASE_CURRENT_STACK_ESTABLISHED
 
 .Lsecondary_start_common:
 
@@ -202,6 +206,8 @@ secondary_start_sbi:
 #endif
 	call .Lsetup_trap_vector
 	scs_load_current
+	/* LKM_CHECKPOINT name=ApEntryPreludePhase.Ready variant=ApEntryPreludePhaseReady fingerprint=sha256:d496514d4a2aa57dda69422840759ef0415663e8fb24f44cccf47dcdba632e68 */
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_AP_ENTRY_PRELUDE_PHASE_READY
 	call smp_callin
 #endif /* CONFIG_SMP */
 

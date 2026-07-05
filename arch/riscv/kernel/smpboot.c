@@ -13,6 +13,7 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/kernel.h>
+#include <linux/lkm_checkpoints.h>
 #include <linux/mm.h>
 #include <linux/sched.h>
 #include <linux/kernel_stat.h>
@@ -173,8 +174,13 @@ void __init setup_smp(void)
 
 static int start_secondary_cpu(int cpu, struct task_struct *tidle)
 {
-	if (cpu_ops->cpu_start)
+	if (cpu_ops->cpu_start) {
+		/* LKM_CHECKPOINT name=CpuStartProvider.Ready variant=CpuStartProviderReady fingerprint=sha256:8529db6ec0d62d253c3a3cb1938062e69c8f8bddc0d1c902132b088bfbed14db */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+		lkm_checkpoint_record(LKM_CHECKPOINT_CPU_START_PROVIDER_READY);
+#endif
 		return cpu_ops->cpu_start(cpu, tidle);
+	}
 
 	return -EOPNOTSUPP;
 }
@@ -186,6 +192,10 @@ int __cpu_up(unsigned int cpu, struct task_struct *tidle)
 
 	ret = start_secondary_cpu(cpu, tidle);
 	if (!ret) {
+		/* LKM_CHECKPOINT name=SecondaryCpuStartupAck.Ready variant=SecondaryCpuStartupAckReady fingerprint=sha256:7a8abb5e3cd4ddd182a1a1479f40e4a9de925349905b0aa307ae1d0bea39fcca */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+		lkm_checkpoint_record(LKM_CHECKPOINT_SECONDARY_CPU_STARTUP_ACK_READY);
+#endif
 		wait_for_completion_timeout(&cpu_running,
 					    msecs_to_jiffies(1000));
 
@@ -212,6 +222,10 @@ asmlinkage __visible void smp_callin(void)
 	struct mm_struct *mm = &init_mm;
 	unsigned int curr_cpuid = smp_processor_id();
 
+	/* LKM_CHECKPOINT name=ApSmpCallinPhase.Started variant=ApSmpCallinPhaseStarted fingerprint=sha256:f4bf2211aef4b017758b962e54d4af03ab7a672269c53ad5e14f58e0cd965555 */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+	lkm_checkpoint_record(LKM_CHECKPOINT_AP_SMP_CALLIN_PHASE_STARTED);
+#endif
 	if (has_vector()) {
 		/*
 		 * Return as early as possible so the hart with a mismatching
@@ -241,11 +255,21 @@ asmlinkage __visible void smp_callin(void)
 	 */
 	local_flush_icache_all();
 	local_flush_tlb_all();
+	/* LKM_CHECKPOINT name=ApSmpCallinPhase.CpuRunningProduced variant=ApSmpCallinCpuRunningProduced fingerprint=sha256:21582b6d1714784e322da76181705a0a0852d4e932a7643031dae8d546ccfd66 */
+	/* LKM_CHECKPOINT name=ApSmpCallinPhase.Ready variant=ApSmpCallinPhaseReady fingerprint=sha256:21582b6d1714784e322da76181705a0a0852d4e932a7643031dae8d546ccfd66 */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+	lkm_checkpoint_record(LKM_CHECKPOINT_AP_SMP_CALLIN_CPU_RUNNING_PRODUCED);
+	lkm_checkpoint_record(LKM_CHECKPOINT_AP_SMP_CALLIN_PHASE_READY);
+#endif
 	complete(&cpu_running);
 	/*
 	 * Disable preemption before enabling interrupts, so we don't try to
 	 * schedule a CPU that hasn't actually started yet.
 	 */
+	/* LKM_CHECKPOINT name=ApOnlineIdlePhase.Started variant=ApOnlineIdlePhaseStarted fingerprint=sha256:986de6743ce3873bbe3119396afa419f702147c83cda21b8c340a4cabc85b0a5 */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+	lkm_checkpoint_record(LKM_CHECKPOINT_AP_ONLINE_IDLE_PHASE_STARTED);
+#endif
 	local_irq_enable();
 	cpu_startup_entry(CPUHP_AP_ONLINE_IDLE);
 }

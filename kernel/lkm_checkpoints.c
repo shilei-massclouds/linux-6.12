@@ -328,6 +328,36 @@ static const char *lkm_checkpoint_name(u8 id)
 		return "PayloadPhase.Ready";
 	case LKM_CHECKPOINT_PAYLOAD_PHASE_ONLINE:
 		return "PayloadPhase.Online";
+	case LKM_CHECKPOINT_CPU_START_PROVIDER_READY:
+		return "CpuStartProvider.Ready";
+	case LKM_CHECKPOINT_CPU_START_PROVIDER_BOOT_DATA_SELECTED:
+		return "CpuStartProvider.BootDataSelected";
+	case LKM_CHECKPOINT_CPU_START_PROVIDER_BOOT_DATA_PUBLISHED:
+		return "CpuStartProvider.BootDataPublished";
+	case LKM_CHECKPOINT_CPU_START_PROVIDER_HSM_START_ISSUED:
+		return "CpuStartProvider.HsmStartIssued";
+	case LKM_CHECKPOINT_AP_ENTRY_PRELUDE_PHASE_STARTED:
+		return "ApEntryPreludePhase.Started";
+	case LKM_CHECKPOINT_AP_ENTRY_PRELUDE_PHASE_CURRENT_STACK_ESTABLISHED:
+		return "ApEntryPreludePhase.CurrentStackEstablished";
+	case LKM_CHECKPOINT_AP_ENTRY_PRELUDE_PHASE_READY:
+		return "ApEntryPreludePhase.Ready";
+	case LKM_CHECKPOINT_AP_SMP_CALLIN_PHASE_STARTED:
+		return "ApSmpCallinPhase.Started";
+	case LKM_CHECKPOINT_AP_SMP_CALLIN_CPU_RUNNING_PRODUCED:
+		return "ApSmpCallinPhase.CpuRunningProduced";
+	case LKM_CHECKPOINT_AP_SMP_CALLIN_PHASE_READY:
+		return "ApSmpCallinPhase.Ready";
+	case LKM_CHECKPOINT_AP_ONLINE_IDLE_PHASE_STARTED:
+		return "ApOnlineIdlePhase.Started";
+	case LKM_CHECKPOINT_AP_ONLINE_IDLE_DONE_UP_PRODUCED:
+		return "ApOnlineIdlePhase.DoneUpProduced";
+	case LKM_CHECKPOINT_AP_ONLINE_IDLE_PHASE_READY:
+		return "ApOnlineIdlePhase.Ready";
+	case LKM_CHECKPOINT_SECONDARY_CPU_STARTUP_ACK_READY:
+		return "SecondaryCpuStartupAck.Ready";
+	case LKM_CHECKPOINT_SECONDARY_CPU_ONLINE_ACK_READY:
+		return "SecondaryCpuOnlineAck.Ready";
 	default:
 		return "UnknownCheckpoint";
 	}

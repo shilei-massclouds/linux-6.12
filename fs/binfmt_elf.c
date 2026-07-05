@@ -853,8 +853,8 @@ static int load_elf_binary(struct linux_binprm *bprm)
 	if (!bprm->file->f_op->mmap)
 		goto out;
 
-	/* LKM_CHECKPOINT name=UserBoot.MainElfReady variant=UserBootMainElfReady fingerprint=sha256:70c7a48954553725b3dd6e1cd78f576a622a38c6f07a5ca250432c9981b36653 */
-	/* LKM_CHECKPOINT name=UserExec.MainElfReady variant=UserExecMainElfReady fingerprint=sha256:70c7a48954553725b3dd6e1cd78f576a622a38c6f07a5ca250432c9981b36653 */
+	/* LKM_CHECKPOINT name=UserBoot.MainElfReady variant=UserBootMainElfReady fingerprint=sha256:44b0e14f6cbdd13bb767580b66282fe843c1496b0ec1941738ea004d85ecc554 */
+	/* LKM_CHECKPOINT name=UserExec.MainElfReady variant=UserExecMainElfReady fingerprint=sha256:44b0e14f6cbdd13bb767580b66282fe843c1496b0ec1941738ea004d85ecc554 */
 	lkm_checkpoint_record_exec_main_elf_ready();
 	elf_phdata = load_elf_phdrs(elf_ex, bprm->file);
 	if (!elf_phdata)
@@ -956,8 +956,8 @@ out_free_interp:
 			goto out_free_dentry;
 
 		/* Load the interpreter program headers */
-		/* LKM_CHECKPOINT name=UserBoot.InterpreterReady variant=UserBootInterpreterReady fingerprint=sha256:91cca162296f4afdd0504ffb586f55efaa5b012ac2438a5a0339885b02e2b373 */
-		/* LKM_CHECKPOINT name=UserExec.InterpreterReady variant=UserExecInterpreterReady fingerprint=sha256:91cca162296f4afdd0504ffb586f55efaa5b012ac2438a5a0339885b02e2b373 */
+		/* LKM_CHECKPOINT name=UserBoot.InterpreterReady variant=UserBootInterpreterReady fingerprint=sha256:0b92a2beb44ecc12213e7a0d0f2c3b54fa694d87ab4adf40f2442967ef731a62 */
+		/* LKM_CHECKPOINT name=UserExec.InterpreterReady variant=UserExecInterpreterReady fingerprint=sha256:0b92a2beb44ecc12213e7a0d0f2c3b54fa694d87ab4adf40f2442967ef731a62 */
 		lkm_checkpoint_record_exec_interpreter_ready();
 		interp_elf_phdata = load_elf_phdrs(interp_elf_ex,
 						   interpreter);
@@ -1000,7 +1000,7 @@ out_free_interp:
 		goto out_free_dentry;
 
 	/* Flush all traces of the currently running executable */
-	/* LKM_CHECKPOINT name=UserBoot.AddressSpaceSetupStart variant=UserBootAddressSpaceSetupStart fingerprint=sha256:ab2cc91a9abd25c39e3da418d8678e7581e123de06b320ae20026134c5df01af */
+	/* LKM_CHECKPOINT name=UserBoot.AddressSpaceSetupStart variant=UserBootAddressSpaceSetupStart fingerprint=sha256:dd94ba13a9d9a3e9a1328f6ff0c4746447dc6e1fbd0b8028cfa6e223bb7e7685 */
 	lkm_checkpoint_record_exec_address_space_setup_start();
 	retval = begin_new_exec(bprm);
 	if (retval)

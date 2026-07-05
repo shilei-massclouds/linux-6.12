@@ -6,6 +6,7 @@
  */
 
 #include <linux/init.h>
+#include <linux/lkm_checkpoints.h>
 #include <linux/mm.h>
 #include <linux/sched/task_stack.h>
 #include <asm/cpu_ops.h>
@@ -28,6 +29,10 @@ static int sbi_hsm_hart_start(unsigned long hartid, unsigned long saddr,
 {
 	struct sbiret ret;
 
+	/* LKM_CHECKPOINT name=CpuStartProvider.HsmStartIssued variant=CpuStartProviderHsmStartIssued fingerprint=sha256:e108b6ecc8da2b28ee6b153cabcf19cafae4b083c6ca92cdf3dd75dfa97d11af */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+	lkm_checkpoint_record(LKM_CHECKPOINT_CPU_START_PROVIDER_HSM_START_ISSUED);
+#endif
 	ret = sbi_ecall(SBI_EXT_HSM, SBI_EXT_HSM_HART_START,
 			hartid, saddr, priv, 0, 0, 0);
 	if (ret.error)
@@ -71,8 +76,16 @@ static int sbi_cpu_start(unsigned int cpuid, struct task_struct *tidle)
 
 	/* Make sure tidle is updated */
 	smp_mb();
+	/* LKM_CHECKPOINT name=CpuStartProvider.BootDataSelected variant=CpuStartProviderBootDataSelected fingerprint=sha256:c2da1fa224bcf8ba6d1fda664aff77b385a9f97333689412987a981dc90e9d7c */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+	lkm_checkpoint_record(LKM_CHECKPOINT_CPU_START_PROVIDER_BOOT_DATA_SELECTED);
+#endif
 	bdata->task_ptr = tidle;
 	bdata->stack_ptr = task_pt_regs(tidle);
+	/* LKM_CHECKPOINT name=CpuStartProvider.BootDataPublished variant=CpuStartProviderBootDataPublished fingerprint=sha256:d3e9814e84ae0d1f7ada1fc682164207d0c4aed2d912ea546882ac3bf3de017b */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+	lkm_checkpoint_record(LKM_CHECKPOINT_CPU_START_PROVIDER_BOOT_DATA_PUBLISHED);
+#endif
 	/* Make sure boot data is updated */
 	smp_mb();
 	hsm_data = __pa(bdata);

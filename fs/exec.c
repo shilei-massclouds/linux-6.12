@@ -1001,8 +1001,8 @@ static int exec_mmap(struct mm_struct *mm)
 	 */
 	if (!IS_ENABLED(CONFIG_ARCH_WANT_IRQS_OFF_ACTIVATE_MM))
 		local_irq_enable();
-	/* LKM_CHECKPOINT name=UserAddressSpace.Ready variant=UserAddressSpaceReady fingerprint=sha256:52cc76b167b557bf6e99444af6b8fdeacb40cb2438cd269db2d82c18e83087b0 */
-	/* LKM_CHECKPOINT name=UserExec.SatpReady variant=UserExecSatpReady fingerprint=sha256:52cc76b167b557bf6e99444af6b8fdeacb40cb2438cd269db2d82c18e83087b0 */
+	/* LKM_CHECKPOINT name=UserAddressSpace.Ready variant=UserAddressSpaceReady fingerprint=sha256:284874d727bc6d6244f03f9b814b58336a0a51b50dc94df28bd5ba23e00aead0 */
+	/* LKM_CHECKPOINT name=UserExec.SatpReady variant=UserExecSatpReady fingerprint=sha256:284874d727bc6d6244f03f9b814b58336a0a51b50dc94df28bd5ba23e00aead0 */
 	lkm_checkpoint_record_exec_satp_ready();
 	activate_mm(active_mm, mm);
 	if (IS_ENABLED(CONFIG_ARCH_WANT_IRQS_OFF_ACTIVATE_MM))
@@ -1281,7 +1281,7 @@ int begin_new_exec(struct linux_binprm * bprm)
 	 * Release all of the old mmap stuff
 	 */
 	acct_arg_size(bprm, 0);
-	/* LKM_CHECKPOINT name=UserExec.ContextReplaced variant=UserExecContextReplaced fingerprint=sha256:379cd75c60d96e53ce2a0a48369812f4ed1507169fa9f5d6adac77cb33711934 */
+	/* LKM_CHECKPOINT name=UserExec.ContextReplaced variant=UserExecContextReplaced fingerprint=sha256:77d4a9a31a51d96fe31d7555248b5983de5f3dcb999ef88de32be4f5abf58d26 */
 	lkm_checkpoint_record_exec_context_replaced();
 	retval = exec_mmap(bprm->mm);
 	if (retval)

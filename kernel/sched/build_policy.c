@@ -23,6 +23,7 @@
 #include <linux/cpuidle.h>
 #include <linux/jiffies.h>
 #include <linux/kobject.h>
+#include <linux/lkm_checkpoints.h>
 #include <linux/livepatch.h>
 #include <linux/pm.h>
 #include <linux/psi.h>

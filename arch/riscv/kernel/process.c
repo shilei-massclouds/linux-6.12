@@ -149,7 +149,7 @@ void start_thread(struct pt_regs *regs, unsigned long pc,
 		 */
 		fstate_restore(current, regs);
 	}
-	/* LKM_CHECKPOINT name=UserExec.TrapFrameReady variant=UserExecTrapFrameReady fingerprint=sha256:24ef597d20f2af8416983b020dd49bf0705b28e8a0fe067fe20b5280034c6d8d */
+	/* LKM_CHECKPOINT name=UserExec.TrapFrameReady variant=UserExecTrapFrameReady fingerprint=sha256:bae39591e723d1fadcc0d5140a4ba2900f1b3da392f6d64909e702058ea114ec */
 	lkm_checkpoint_record_exec_trap_frame_ready();
 	regs->epc = pc;
 	regs->sp = sp;

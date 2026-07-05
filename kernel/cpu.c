@@ -21,6 +21,7 @@
 #include <linux/export.h>
 #include <linux/bug.h>
 #include <linux/kthread.h>
+#include <linux/lkm_checkpoints.h>
 #include <linux/stop_machine.h>
 #include <linux/mutex.h>
 #include <linux/gfp.h>
@@ -794,6 +795,10 @@ static int bringup_wait_for_ap_online(unsigned int cpu)
 	struct cpuhp_cpu_state *st = per_cpu_ptr(&cpuhp_state, cpu);
 
 	/* Wait for the CPU to reach CPUHP_AP_ONLINE_IDLE */
+	/* LKM_CHECKPOINT name=SecondaryCpuOnlineAck.Ready variant=SecondaryCpuOnlineAckReady fingerprint=sha256:e34112086cb069028cdb712d5c1bb09a8fe097f69119bdfe9c90a3263eeecf34 */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+	lkm_checkpoint_record(LKM_CHECKPOINT_SECONDARY_CPU_ONLINE_ACK_READY);
+#endif
 	wait_for_ap_thread(st, true);
 	if (WARN_ON_ONCE((!cpu_online(cpu))))
 		return -ECANCELED;
@@ -1625,6 +1630,10 @@ void cpuhp_online_idle(enum cpuhp_state state)
 	stop_machine_unpark(smp_processor_id());
 
 	st->state = CPUHP_AP_ONLINE_IDLE;
+	/* LKM_CHECKPOINT name=ApOnlineIdlePhase.DoneUpProduced variant=ApOnlineIdleDoneUpProduced fingerprint=sha256:ea16eeb18091544560e4d7ab4aea1c676873f87148b780bf3124f661f392ce46 */
+#if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
+	lkm_checkpoint_record(LKM_CHECKPOINT_AP_ONLINE_IDLE_DONE_UP_PRODUCED);
+#endif
 	complete_ap_thread(st, true);
 }
 
