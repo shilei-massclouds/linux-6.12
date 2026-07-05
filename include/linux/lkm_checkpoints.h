@@ -96,10 +96,34 @@
 #ifndef __ASSEMBLY__
 #include <linux/types.h>
 
+#define LKM_CHECKPOINT_EXEC_OWNER_NONE 0
+#define LKM_CHECKPOINT_EXEC_OWNER_BOOT 1
+#define LKM_CHECKPOINT_EXEC_OWNER_RUNTIME 2
+
 #if defined(CONFIG_LKM_CHECKPOINTS) && defined(CONFIG_RISCV)
 void lkm_checkpoint_record(u8 id);
+void lkm_checkpoint_exec_begin_boot(void);
+void lkm_checkpoint_exec_begin_runtime(void);
+void lkm_checkpoint_exec_failed(void);
+void lkm_checkpoint_record_exec_main_elf_ready(void);
+void lkm_checkpoint_record_exec_interpreter_ready(void);
+void lkm_checkpoint_record_exec_address_space_setup_start(void);
+void lkm_checkpoint_record_exec_satp_ready(void);
+void lkm_checkpoint_record_exec_context_replaced(void);
+void lkm_checkpoint_record_exec_trap_frame_ready(void);
+void lkm_checkpoint_record_exec_return_to_user(void);
 #else
 static inline void lkm_checkpoint_record(u8 id) {}
+static inline void lkm_checkpoint_exec_begin_boot(void) {}
+static inline void lkm_checkpoint_exec_begin_runtime(void) {}
+static inline void lkm_checkpoint_exec_failed(void) {}
+static inline void lkm_checkpoint_record_exec_main_elf_ready(void) {}
+static inline void lkm_checkpoint_record_exec_interpreter_ready(void) {}
+static inline void lkm_checkpoint_record_exec_address_space_setup_start(void) {}
+static inline void lkm_checkpoint_record_exec_satp_ready(void) {}
+static inline void lkm_checkpoint_record_exec_context_replaced(void) {}
+static inline void lkm_checkpoint_record_exec_trap_frame_ready(void) {}
+static inline void lkm_checkpoint_record_exec_return_to_user(void) {}
 #endif
 void lkm_checkpoints_dump(void);
 #endif

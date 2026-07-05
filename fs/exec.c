@@ -1003,8 +1003,7 @@ static int exec_mmap(struct mm_struct *mm)
 		local_irq_enable();
 	/* LKM_CHECKPOINT name=UserAddressSpace.Ready variant=UserAddressSpaceReady fingerprint=sha256:52cc76b167b557bf6e99444af6b8fdeacb40cb2438cd269db2d82c18e83087b0 */
 	/* LKM_CHECKPOINT name=UserExec.SatpReady variant=UserExecSatpReady fingerprint=sha256:52cc76b167b557bf6e99444af6b8fdeacb40cb2438cd269db2d82c18e83087b0 */
-	lkm_checkpoint_record(LKM_CHECKPOINT_USER_ADDRESS_SPACE_READY);
-	lkm_checkpoint_record(LKM_CHECKPOINT_USER_EXEC_SATP_READY);
+	lkm_checkpoint_record_exec_satp_ready();
 	activate_mm(active_mm, mm);
 	if (IS_ENABLED(CONFIG_ARCH_WANT_IRQS_OFF_ACTIVATE_MM))
 		local_irq_enable();
@@ -1283,7 +1282,7 @@ int begin_new_exec(struct linux_binprm * bprm)
 	 */
 	acct_arg_size(bprm, 0);
 	/* LKM_CHECKPOINT name=UserExec.ContextReplaced variant=UserExecContextReplaced fingerprint=sha256:379cd75c60d96e53ce2a0a48369812f4ed1507169fa9f5d6adac77cb33711934 */
-	lkm_checkpoint_record(LKM_CHECKPOINT_USER_EXEC_CONTEXT_REPLACED);
+	lkm_checkpoint_record_exec_context_replaced();
 	retval = exec_mmap(bprm->mm);
 	if (retval)
 		goto out;
@@ -1958,7 +1957,10 @@ static int do_execveat_common(int fd, struct filename *filename,
 		bprm->argc = 1;
 	}
 
+	lkm_checkpoint_exec_begin_runtime();
 	retval = bprm_execve(bprm);
+	if (retval < 0)
+		lkm_checkpoint_exec_failed();
 out_free:
 	free_bprm(bprm);
 
@@ -2018,7 +2020,10 @@ int kernel_execve(const char *kernel_filename,
 	if (retval < 0)
 		goto out_free;
 
+	lkm_checkpoint_exec_begin_boot();
 	retval = bprm_execve(bprm);
+	if (retval < 0)
+		lkm_checkpoint_exec_failed();
 out_free:
 	free_bprm(bprm);
 out_ret:

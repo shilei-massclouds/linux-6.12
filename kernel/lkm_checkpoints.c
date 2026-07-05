@@ -7,6 +7,7 @@
 #include <linux/atomic.h>
 #include <linux/compiler.h>
 #include <linux/minmax.h>
+#include <linux/sched.h>
 #include <linux/string.h>
 #include <linux/types.h>
 #include <asm/sbi.h>
@@ -17,6 +18,61 @@ extern unsigned long lkm_checkpoint_dropped;
 extern unsigned int lkm_checkpoint_overflow;
 
 static atomic_t lkm_checkpoint_dumped = ATOMIC_INIT(0);
+
+static struct task_struct *lkm_checkpoint_exec_owner_task;
+static u8 lkm_checkpoint_exec_owner = LKM_CHECKPOINT_EXEC_OWNER_NONE;
+
+static void lkm_checkpoint_exec_begin(u8 owner)
+{
+	WRITE_ONCE(lkm_checkpoint_exec_owner_task, current);
+	WRITE_ONCE(lkm_checkpoint_exec_owner, owner);
+}
+
+void lkm_checkpoint_exec_begin_boot(void)
+{
+	lkm_checkpoint_exec_begin(LKM_CHECKPOINT_EXEC_OWNER_BOOT);
+}
+
+void lkm_checkpoint_exec_begin_runtime(void)
+{
+	lkm_checkpoint_exec_begin(LKM_CHECKPOINT_EXEC_OWNER_RUNTIME);
+}
+
+static u8 lkm_checkpoint_current_exec_owner(void)
+{
+	if (READ_ONCE(lkm_checkpoint_exec_owner_task) != current)
+		return LKM_CHECKPOINT_EXEC_OWNER_NONE;
+
+	return READ_ONCE(lkm_checkpoint_exec_owner);
+}
+
+static void lkm_checkpoint_exec_clear_current(void)
+{
+	if (READ_ONCE(lkm_checkpoint_exec_owner_task) != current)
+		return;
+
+	WRITE_ONCE(lkm_checkpoint_exec_owner, LKM_CHECKPOINT_EXEC_OWNER_NONE);
+	WRITE_ONCE(lkm_checkpoint_exec_owner_task, NULL);
+}
+
+void lkm_checkpoint_exec_failed(void)
+{
+	lkm_checkpoint_exec_clear_current();
+}
+
+static void lkm_checkpoint_record_boot_or_runtime(u8 boot_id, u8 runtime_id)
+{
+	switch (lkm_checkpoint_current_exec_owner()) {
+	case LKM_CHECKPOINT_EXEC_OWNER_BOOT:
+		lkm_checkpoint_record(boot_id);
+		break;
+	case LKM_CHECKPOINT_EXEC_OWNER_RUNTIME:
+		lkm_checkpoint_record(runtime_id);
+		break;
+	default:
+		break;
+	}
+}
 
 void lkm_checkpoint_record(u8 id)
 {
@@ -30,6 +86,67 @@ void lkm_checkpoint_record(u8 id)
 	}
 
 	WRITE_ONCE(lkm_checkpoint_events[index], id);
+}
+
+void lkm_checkpoint_record_exec_main_elf_ready(void)
+{
+	lkm_checkpoint_record_boot_or_runtime(
+		LKM_CHECKPOINT_USER_BOOT_MAIN_ELF_READY,
+		LKM_CHECKPOINT_USER_EXEC_MAIN_ELF_READY);
+}
+
+void lkm_checkpoint_record_exec_interpreter_ready(void)
+{
+	lkm_checkpoint_record_boot_or_runtime(
+		LKM_CHECKPOINT_USER_BOOT_INTERPRETER_READY,
+		LKM_CHECKPOINT_USER_EXEC_INTERPRETER_READY);
+}
+
+void lkm_checkpoint_record_exec_address_space_setup_start(void)
+{
+	if (lkm_checkpoint_current_exec_owner() ==
+	    LKM_CHECKPOINT_EXEC_OWNER_BOOT)
+		lkm_checkpoint_record(
+			LKM_CHECKPOINT_USER_BOOT_ADDRESS_SPACE_SETUP_START);
+}
+
+void lkm_checkpoint_record_exec_satp_ready(void)
+{
+	lkm_checkpoint_record_boot_or_runtime(
+		LKM_CHECKPOINT_USER_ADDRESS_SPACE_READY,
+		LKM_CHECKPOINT_USER_EXEC_SATP_READY);
+}
+
+void lkm_checkpoint_record_exec_context_replaced(void)
+{
+	if (lkm_checkpoint_current_exec_owner() ==
+	    LKM_CHECKPOINT_EXEC_OWNER_RUNTIME)
+		lkm_checkpoint_record(
+			LKM_CHECKPOINT_USER_EXEC_CONTEXT_REPLACED);
+}
+
+void lkm_checkpoint_record_exec_trap_frame_ready(void)
+{
+	if (lkm_checkpoint_current_exec_owner() ==
+	    LKM_CHECKPOINT_EXEC_OWNER_RUNTIME)
+		lkm_checkpoint_record(LKM_CHECKPOINT_USER_EXEC_TRAP_FRAME_READY);
+}
+
+void lkm_checkpoint_record_exec_return_to_user(void)
+{
+	switch (lkm_checkpoint_current_exec_owner()) {
+	case LKM_CHECKPOINT_EXEC_OWNER_BOOT:
+		lkm_checkpoint_record(LKM_CHECKPOINT_USER_MODE_ENTRY);
+		break;
+	case LKM_CHECKPOINT_EXEC_OWNER_RUNTIME:
+		lkm_checkpoint_record(LKM_CHECKPOINT_USER_EXEC_SATP_SWITCHED);
+		lkm_checkpoint_record(LKM_CHECKPOINT_USER_EXEC_RETURN_FRAME_READY);
+		break;
+	default:
+		return;
+	}
+
+	lkm_checkpoint_exec_clear_current();
 }
 
 static const char *lkm_checkpoint_name(u8 id)
