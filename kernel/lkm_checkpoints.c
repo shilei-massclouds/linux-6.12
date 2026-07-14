@@ -152,8 +152,8 @@ void lkm_checkpoint_record_exec_return_to_user(void)
 static const char *lkm_checkpoint_name(u8 id)
 {
 	switch (id) {
-	case LKM_CHECKPOINT_STARTUP_TIMELINE_STARTED:
-		return "StartupTimeline.Started";
+	case LKM_CHECKPOINT_KERNEL_STARTED:
+		return "Kernel.Started";
 	case LKM_CHECKPOINT_ENTRY_PRELUDE_PHASE_STARTED:
 		return "EntryPreludePhase.Started";
 	case LKM_CHECKPOINT_ENTRY_PRELUDE_PHASE_READY:

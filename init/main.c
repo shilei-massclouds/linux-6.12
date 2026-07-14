@@ -903,10 +903,10 @@ static void __init early_numa_node_init(void)
 }
 
 asmlinkage __visible __init __no_sanitize_address __noreturn __no_stack_protector
-/* LKM_CHECKPOINT name=StartupTimeline.Started variant=StartupTimelineStarted fingerprint=sha256:157e6bf6ecd4ba00cd50b5e0ca62ec6a68da217256432e23ceb379c27df14abc */
+/* LKM_CHECKPOINT name=Kernel.Started variant=KernelStarted fingerprint=sha256:157e6bf6ecd4ba00cd50b5e0ca62ec6a68da217256432e23ceb379c27df14abc */
 void start_kernel(void)
 {
-	lkm_checkpoint_record(LKM_CHECKPOINT_STARTUP_TIMELINE_STARTED);
+	lkm_checkpoint_record(LKM_CHECKPOINT_KERNEL_STARTED);
 	char *command_line;
 	char *after_dashes;
 
@@ -1410,6 +1410,7 @@ static void __init do_pre_smp_initcalls(void)
 		do_one_initcall(initcall_from_entry(fn));
 }
 
+/* LKM_CHECKPOINT name=PayloadPhase.Online variant=PayloadPhaseOnline fingerprint=sha256:9f1de807883b6e45dbfb0acb2024d721681600ea904b12ba51fd443c94f8a643 */
 static int run_init_process(const char *init_filename)
 {
 	const char *const *p;
@@ -1422,7 +1423,7 @@ static int run_init_process(const char *init_filename)
 	pr_debug("  with environment:\n");
 	for (p = envp_init; *p; p++)
 		pr_debug("    %s\n", *p);
-	return kernel_execve(init_filename, argv_init, envp_init);
+	return lkm_checkpoint_record_payload_online(kernel_execve(init_filename, argv_init, envp_init));
 }
 
 static int try_to_run_init_process(const char *init_filename)
@@ -1565,7 +1566,6 @@ static int __ref kernel_init(void *unused)
 	 * trying to recover a really broken machine.
 	 */
 	if (execute_command) {
-		lkm_checkpoint_record(LKM_CHECKPOINT_PAYLOAD_PHASE_ONLINE);
 		ret = run_init_process(execute_command);
 		if (!ret)
 			return 0;
@@ -1582,8 +1582,6 @@ static int __ref kernel_init(void *unused)
 			return 0;
 	}
 
-	/* LKM_CHECKPOINT name=PayloadPhase.Online variant=PayloadPhaseOnline fingerprint=sha256:e00e7171e78e8e3250b0da24ae019fd51af8b634105d2e403636a2428b54b49f */
-	lkm_checkpoint_record(LKM_CHECKPOINT_PAYLOAD_PHASE_ONLINE);
 	if (!try_to_run_init_process("/sbin/init") ||
 	    !try_to_run_init_process("/etc/init") ||
 	    !try_to_run_init_process("/bin/init") ||
@@ -1637,14 +1635,14 @@ static noinline void __init kernel_init_freeable(void)
 	lkm_checkpoint_record(LKM_CHECKPOINT_SMP_BRINGUP_PHASE_STARTED);
 	smp_init();
 	/* LKM_CHECKPOINT name=SmpBringupPhase.Ready variant=SmpBringupPhaseReady fingerprint=sha256:675d01169b756a814d0e8fe57b9ad1c49594664305e8521af77e097e9f33c3bf */
+	/* LKM_CHECKPOINT name=RuntimeCorePhase.Started variant=RuntimeCorePhaseStarted fingerprint=sha256:675d01169b756a814d0e8fe57b9ad1c49594664305e8521af77e097e9f33c3bf */
 	/* LKM_CHECKPOINT name=Scheduler.SmpReady variant=SchedulerSmpReady fingerprint=sha256:675d01169b756a814d0e8fe57b9ad1c49594664305e8521af77e097e9f33c3bf */
 	lkm_checkpoint_record(LKM_CHECKPOINT_SMP_BRINGUP_PHASE_READY);
+	lkm_checkpoint_record(LKM_CHECKPOINT_RUNTIME_CORE_PHASE_STARTED);
 	lkm_checkpoint_record(LKM_CHECKPOINT_SCHEDULER_SMP_READY);
 	sched_init_smp();
 
-	/* LKM_CHECKPOINT name=RuntimeCorePhase.Started variant=RuntimeCorePhaseStarted fingerprint=sha256:03dfeb8f64384687156aeddedf07992345fb047ee1f56b3abb305105a96fbd1d */
 	/* LKM_CHECKPOINT name=Workqueue.TopologyReady variant=WorkqueueTopologyReady fingerprint=sha256:03dfeb8f64384687156aeddedf07992345fb047ee1f56b3abb305105a96fbd1d */
-	lkm_checkpoint_record(LKM_CHECKPOINT_RUNTIME_CORE_PHASE_STARTED);
 	lkm_checkpoint_record(LKM_CHECKPOINT_WORKQUEUE_TOPOLOGY_READY);
 	workqueue_init_topology();
 	/* LKM_CHECKPOINT name=AsyncCore.DeferredReady variant=AsyncCoreDeferredReady fingerprint=sha256:61c13f44ed28517448e066192dd123eafb7c4e3c03735c68ab598e615b38ecda */
@@ -1663,7 +1661,9 @@ static noinline void __init kernel_init_freeable(void)
 	lkm_checkpoint_record(LKM_CHECKPOINT_INITCALL_PHASE_STARTED);
 	do_basic_setup();
 
+	/* LKM_CHECKPOINT name=RootfsPhase.Started variant=RootfsPhaseStarted fingerprint=sha256:3d33db533450fcce68e9b91ec9cdfbe64176119c483e3fa123bb8da7273f09d0 */
 	/* LKM_CHECKPOINT name=KUnitRuntime.TrimmedReady variant=KUnitRuntimeTrimmedReady fingerprint=sha256:3d33db533450fcce68e9b91ec9cdfbe64176119c483e3fa123bb8da7273f09d0 */
+	lkm_checkpoint_record(LKM_CHECKPOINT_ROOTFS_PHASE_STARTED);
 	lkm_checkpoint_record(LKM_CHECKPOINT_KUNIT_RUNTIME_TRIMMED_READY);
 	kunit_run_all_tests();
 
@@ -1682,8 +1682,6 @@ static noinline void __init kernel_init_freeable(void)
 	lkm_checkpoint_record(LKM_CHECKPOINT_RAMDISK_EXECUTE_COMMAND_EACCESS_CHECKPOINT);
 	if (init_eaccess(ramdisk_execute_command) != 0) {
 		ramdisk_execute_command = NULL;
-		/* LKM_CHECKPOINT name=RootfsPhase.Started variant=RootfsPhaseStarted fingerprint=sha256:40771e6159d99116aed1044932e4ac26854ff6484cd995c1380162fee3db40a4 */
-		lkm_checkpoint_record(LKM_CHECKPOINT_ROOTFS_PHASE_STARTED);
 		prepare_namespace();
 	}
 

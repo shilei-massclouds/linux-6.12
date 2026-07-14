@@ -4,7 +4,7 @@
 
 #define LKM_CHECKPOINT_BUFFER_CAPACITY 512
 
-#define LKM_CHECKPOINT_STARTUP_TIMELINE_STARTED 1
+#define LKM_CHECKPOINT_KERNEL_STARTED 1
 #define LKM_CHECKPOINT_ENTRY_PRELUDE_PHASE_STARTED 2
 #define LKM_CHECKPOINT_ENTRY_PRELUDE_PHASE_READY 3
 #define LKM_CHECKPOINT_EVENT_STREAM_PREPARED 4
@@ -140,6 +140,14 @@ static inline void lkm_checkpoint_record_exec_context_replaced(void) {}
 static inline void lkm_checkpoint_record_exec_trap_frame_ready(void) {}
 static inline void lkm_checkpoint_record_exec_return_to_user(void) {}
 #endif
+
+static inline int lkm_checkpoint_record_payload_online(int ret)
+{
+	if (!ret)
+		lkm_checkpoint_record(LKM_CHECKPOINT_PAYLOAD_PHASE_ONLINE);
+	return ret;
+}
+
 void lkm_checkpoints_dump(void);
 #endif
 
