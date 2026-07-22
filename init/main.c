@@ -1410,7 +1410,7 @@ static void __init do_pre_smp_initcalls(void)
 		do_one_initcall(initcall_from_entry(fn));
 }
 
-/* LKM_CHECKPOINT name=PayloadPhase.Online variant=PayloadPhaseOnline fingerprint=sha256:9f1de807883b6e45dbfb0acb2024d721681600ea904b12ba51fd443c94f8a643 */
+/* LKM_CHECKPOINT name=KernelInitFlow.PayloadHandoffCommitted variant=KernelInitFlowPayloadHandoffCommitted fingerprint=sha256:9f1de807883b6e45dbfb0acb2024d721681600ea904b12ba51fd443c94f8a643 */
 static int run_init_process(const char *init_filename)
 {
 	const char *const *p;
@@ -1423,7 +1423,7 @@ static int run_init_process(const char *init_filename)
 	pr_debug("  with environment:\n");
 	for (p = envp_init; *p; p++)
 		pr_debug("    %s\n", *p);
-	return lkm_checkpoint_record_payload_online(kernel_execve(init_filename, argv_init, envp_init));
+	return lkm_checkpoint_record_payload_handoff_committed(kernel_execve(init_filename, argv_init, envp_init));
 }
 
 static int try_to_run_init_process(const char *init_filename)
@@ -1546,9 +1546,9 @@ static int __ref kernel_init(void *unused)
 	rcu_end_inkernel_boot();
 
 	/* LKM_CHECKPOINT name=SysctlArgs.DeferredReady variant=SysctlArgsDeferredReady fingerprint=sha256:f5f2e1079a8d270dad77c902a0fb62d625de4803905da5c7c92e34c0fa2a64fa */
-	/* LKM_CHECKPOINT name=PayloadPhase.Ready variant=PayloadPhaseReady fingerprint=sha256:f5f2e1079a8d270dad77c902a0fb62d625de4803905da5c7c92e34c0fa2a64fa */
+	/* LKM_CHECKPOINT name=PayloadPreparePhase.Online variant=PayloadPreparePhaseOnline fingerprint=sha256:f5f2e1079a8d270dad77c902a0fb62d625de4803905da5c7c92e34c0fa2a64fa */
 	lkm_checkpoint_record(LKM_CHECKPOINT_SYSCTL_ARGS_DEFERRED_READY);
-	lkm_checkpoint_record(LKM_CHECKPOINT_PAYLOAD_PHASE_READY);
+	lkm_checkpoint_record(LKM_CHECKPOINT_PAYLOAD_PREPARE_PHASE_ONLINE);
 	do_sysctl_args();
 
 	if (ramdisk_execute_command) {

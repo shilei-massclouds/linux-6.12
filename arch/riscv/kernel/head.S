@@ -194,7 +194,7 @@ secondary_start_sbi:
 	add a3, a3, a1
 	/* LKM_CHECKPOINT name=ApEntryPreludePhase.CurrentStackEstablished variant=ApEntryPreludeCurrentStackEstablished fingerprint=sha256:2c173a00a78e2fa399e2de3aabf1767dd15e63b8fd3a6af16fa7ea2326ad2a94 */
 	REG_L sp, (a3)
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_AP_ENTRY_PRELUDE_PHASE_CURRENT_STACK_ESTABLISHED
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_AP_ENTRY_PRELUDE_CURRENT_STACK_ESTABLISHED
 
 .Lsecondary_start_common:
 

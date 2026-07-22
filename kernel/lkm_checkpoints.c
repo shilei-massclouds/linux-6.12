@@ -136,7 +136,7 @@ void lkm_checkpoint_record_exec_return_to_user(void)
 {
 	switch (lkm_checkpoint_current_exec_owner()) {
 	case LKM_CHECKPOINT_EXEC_OWNER_BOOT:
-		lkm_checkpoint_record(LKM_CHECKPOINT_USER_MODE_ENTRY);
+		lkm_checkpoint_record(LKM_CHECKPOINT_USER_APP_FLOW_ENTER_USER_MODE);
 		break;
 	case LKM_CHECKPOINT_EXEC_OWNER_RUNTIME:
 		lkm_checkpoint_record(LKM_CHECKPOINT_USER_EXEC_SATP_SWITCHED);
@@ -282,8 +282,8 @@ static const char *lkm_checkpoint_name(u8 id)
 		return "UserBoot.InterpreterReady";
 	case LKM_CHECKPOINT_USER_BOOT_ADDRESS_SPACE_SETUP_START:
 		return "UserBoot.AddressSpaceSetupStart";
-	case LKM_CHECKPOINT_USER_MODE_ENTRY:
-		return "UserInitProcess.EnterUserMode";
+	case LKM_CHECKPOINT_USER_APP_FLOW_ENTER_USER_MODE:
+		return "UserAppFlow.EnterUserMode";
 	case LKM_CHECKPOINT_USER_ADDRESS_SPACE_READY:
 		return "UserAddressSpace.Ready";
 	case LKM_CHECKPOINT_SYSCALL_TABLE_EXECVE_ARGS_READY:
@@ -324,10 +324,10 @@ static const char *lkm_checkpoint_name(u8 id)
 		return "UserChild.ParentWaitResumed";
 	case LKM_CHECKPOINT_SYSCALL_TABLE_EXIT:
 		return "SyscallTable.Exit";
-	case LKM_CHECKPOINT_PAYLOAD_PHASE_READY:
-		return "PayloadPhase.Ready";
-	case LKM_CHECKPOINT_PAYLOAD_PHASE_ONLINE:
-		return "PayloadPhase.Online";
+	case LKM_CHECKPOINT_PAYLOAD_PREPARE_PHASE_ONLINE:
+		return "PayloadPreparePhase.Online";
+	case LKM_CHECKPOINT_KERNEL_INIT_FLOW_PAYLOAD_HANDOFF_COMMITTED:
+		return "KernelInitFlow.PayloadHandoffCommitted";
 	case LKM_CHECKPOINT_CPU_START_PROVIDER_READY:
 		return "CpuStartProvider.Ready";
 	case LKM_CHECKPOINT_CPU_START_PROVIDER_BOOT_DATA_SELECTED:
@@ -338,7 +338,7 @@ static const char *lkm_checkpoint_name(u8 id)
 		return "CpuStartProvider.HsmStartIssued";
 	case LKM_CHECKPOINT_AP_ENTRY_PRELUDE_PHASE_STARTED:
 		return "ApEntryPreludePhase.Started";
-	case LKM_CHECKPOINT_AP_ENTRY_PRELUDE_PHASE_CURRENT_STACK_ESTABLISHED:
+	case LKM_CHECKPOINT_AP_ENTRY_PRELUDE_CURRENT_STACK_ESTABLISHED:
 		return "ApEntryPreludePhase.CurrentStackEstablished";
 	case LKM_CHECKPOINT_AP_ENTRY_PRELUDE_PHASE_READY:
 		return "ApEntryPreludePhase.Ready";
