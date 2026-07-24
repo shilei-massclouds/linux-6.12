@@ -48,7 +48,7 @@
 #endif
 
 __HEAD
-/* LKM_CHECKPOINT name=EntryPreludePhase.Started variant=EntryPreludePhaseStarted fingerprint=sha256:a6b14a3fc2e8707e6fd99b5c9b71e4515818c83b6fd7e337f7fbe73295ebb179 */
+/* LKM_CHECKPOINT name=BootInitFlow.Started variant=BootInitFlowStarted fingerprint=sha256:a6b14a3fc2e8707e6fd99b5c9b71e4515818c83b6fd7e337f7fbe73295ebb179 */
 SYM_CODE_START(_start)
 	/*
 	 * Image header expected by Linux boot-loaders. The image header data
@@ -243,7 +243,7 @@ SYM_CODE_END(_start)
 
 SYM_CODE_START(_start_kernel)
 	/* Mask all interrupts */
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_ENTRY_PRELUDE_PHASE_STARTED
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_BOOT_INIT_FLOW_STARTED
 	csrw CSR_IE, zero
 	csrw CSR_IP, zero
 
@@ -379,8 +379,8 @@ SYM_CODE_START(_start_kernel)
 #endif
 	/* Start the kernel */
 	call soc_early_init
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_ENTRY_PRELUDE_PHASE_READY
-	/* LKM_CHECKPOINT name=EntryPreludePhase.Ready variant=EntryPreludePhaseReady fingerprint=sha256:5ecb990a05c54bab19008411bb0c460ff7a4a2744d65387556a504e38cc7159e */
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_BOOT_INIT_FLOW_PREPARED
+	/* LKM_CHECKPOINT name=BootInitFlow.Prepared variant=BootInitFlowPrepared fingerprint=sha256:5ecb990a05c54bab19008411bb0c460ff7a4a2744d65387556a504e38cc7159e */
 	tail start_kernel
 
 #ifdef CONFIG_RISCV_BOOT_SPINWAIT

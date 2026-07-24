@@ -154,10 +154,10 @@ static const char *lkm_checkpoint_name(u8 id)
 	switch (id) {
 	case LKM_CHECKPOINT_KERNEL_STARTED:
 		return "Kernel.Started";
-	case LKM_CHECKPOINT_ENTRY_PRELUDE_PHASE_STARTED:
-		return "EntryPreludePhase.Started";
-	case LKM_CHECKPOINT_ENTRY_PRELUDE_PHASE_READY:
-		return "EntryPreludePhase.Ready";
+	case LKM_CHECKPOINT_BOOT_INIT_FLOW_STARTED:
+		return "BootInitFlow.Started";
+	case LKM_CHECKPOINT_BOOT_INIT_FLOW_PREPARED:
+		return "BootInitFlow.Prepared";
 	case LKM_CHECKPOINT_EVENT_STREAM_PREPARED:
 		return "EventStream.Prepared";
 	case LKM_CHECKPOINT_EXCEPTION_STREAM_PREPARED:
