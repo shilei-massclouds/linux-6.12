@@ -225,10 +225,10 @@ secondary_start_sbi:
 .align 2
 .Lsetup_trap_vector:
 	/* Set trap vector to exception handler */
-	/* LKM_CHECKPOINT name=EventStream.Ready variant=EventStreamReady fingerprint=sha256:73984e9dbc51a745cb111d4e6cf9494f4485104d99407371c2eac30db61239e3 */
-	/* LKM_CHECKPOINT name=ExceptionStream.Ready variant=ExceptionStreamReady fingerprint=sha256:73984e9dbc51a745cb111d4e6cf9494f4485104d99407371c2eac30db61239e3 */
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EVENT_STREAM_READY
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EXCEPTION_STREAM_READY
+	/* LKM_CHECKPOINT name=TrapType.Ready variant=TrapTypeReady fingerprint=sha256:73984e9dbc51a745cb111d4e6cf9494f4485104d99407371c2eac30db61239e3 */
+	/* LKM_CHECKPOINT name=ExceptionType.Ready variant=ExceptionTypeReady fingerprint=sha256:73984e9dbc51a745cb111d4e6cf9494f4485104d99407371c2eac30db61239e3 */
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_TRAP_TYPE_READY
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EXCEPTION_TYPE_READY
 	la a0, handle_exception
 	csrw CSR_TVEC, a0
 
@@ -355,10 +355,10 @@ SYM_CODE_START(_start_kernel)
 #endif /* CONFIG_BUILTIN_DTB */
 	/* Set trap vector to spin forever to help debug */
 	la a3, .Lsecondary_park
-	/* LKM_CHECKPOINT name=EventStream.Prepared variant=EventStreamPrepared fingerprint=sha256:863decfd3ccdff59528c0003641e490518ba33adbb26efb777ec3fb97406ef6e */
-	/* LKM_CHECKPOINT name=ExceptionStream.Prepared variant=ExceptionStreamPrepared fingerprint=sha256:863decfd3ccdff59528c0003641e490518ba33adbb26efb777ec3fb97406ef6e */
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EVENT_STREAM_PREPARED
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EXCEPTION_STREAM_PREPARED
+	/* LKM_CHECKPOINT name=TrapType.Prepared variant=TrapTypePrepared fingerprint=sha256:863decfd3ccdff59528c0003641e490518ba33adbb26efb777ec3fb97406ef6e */
+	/* LKM_CHECKPOINT name=ExceptionType.Prepared variant=ExceptionTypePrepared fingerprint=sha256:863decfd3ccdff59528c0003641e490518ba33adbb26efb777ec3fb97406ef6e */
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_TRAP_TYPE_PREPARED
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EXCEPTION_TYPE_PREPARED
 	csrw CSR_TVEC, a3
 	call setup_vm
 #ifdef CONFIG_MMU

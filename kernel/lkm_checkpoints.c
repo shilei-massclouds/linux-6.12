@@ -158,10 +158,10 @@ static const char *lkm_checkpoint_name(u8 id)
 		return "BootInitFlow.Started";
 	case LKM_CHECKPOINT_BOOT_INIT_FLOW_PREPARED:
 		return "BootInitFlow.Prepared";
-	case LKM_CHECKPOINT_EVENT_STREAM_PREPARED:
-		return "EventStream.Prepared";
-	case LKM_CHECKPOINT_EXCEPTION_STREAM_PREPARED:
-		return "ExceptionStream.Prepared";
+	case LKM_CHECKPOINT_TRAP_TYPE_PREPARED:
+		return "TrapType.Prepared";
+	case LKM_CHECKPOINT_EXCEPTION_TYPE_PREPARED:
+		return "ExceptionType.Prepared";
 	case LKM_CHECKPOINT_TRAMPOLINE_VM_ONLINE:
 		return "TrampolineVm.Online";
 	case LKM_CHECKPOINT_RAW_DTB_PREPARED:
@@ -174,14 +174,14 @@ static const char *lkm_checkpoint_name(u8 id)
 		return "EarlyVm.Online";
 	case LKM_CHECKPOINT_KERNEL_IMAGE_ONLINE:
 		return "KernelImage.Online";
-	case LKM_CHECKPOINT_EVENT_STREAM_READY:
-		return "EventStream.Ready";
+	case LKM_CHECKPOINT_TRAP_TYPE_READY:
+		return "TrapType.Ready";
 	case LKM_CHECKPOINT_CORE_PREPARE_PHASE_STARTED:
 		return "CorePreparePhase.Started";
 	case LKM_CHECKPOINT_CORE_PREPARE_PHASE_READY:
 		return "CorePreparePhase.Ready";
-	case LKM_CHECKPOINT_EXCEPTION_STREAM_READY:
-		return "ExceptionStream.Ready";
+	case LKM_CHECKPOINT_EXCEPTION_TYPE_READY:
+		return "ExceptionType.Ready";
 	case LKM_CHECKPOINT_MM_CORE_INIT_PHASE_STARTED:
 		return "MmCoreInitPhase.Started";
 	case LKM_CHECKPOINT_MM_CORE_INIT_PHASE_READY:
