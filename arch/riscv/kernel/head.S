@@ -134,8 +134,8 @@ relocate_enable_mmu:
 	srl a0, a0, PAGE_SHIFT
 	or a0, a0, a1
 	sfence.vma
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_TRAMPOLINE_VM_ONLINE
-	/* LKM_CHECKPOINT name=TrampolineVm.Online variant=TrampolineVmOnline fingerprint=sha256:21f29d6a622a89fdfa1cb048c3bee02e79cb822bc9123e2f414f5a7e4525f2a7 */
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_TRAMPOLINE_VM_TAKE_OVER
+	/* LKM_CHECKPOINT name=TrampolineVm.TakeOver variant=TrampolineVmTakeOver fingerprint=sha256:21f29d6a622a89fdfa1cb048c3bee02e79cb822bc9123e2f414f5a7e4525f2a7 */
 	csrw CSR_SATP, a0
 .align 2
 1:
@@ -153,11 +153,11 @@ relocate_enable_mmu:
 	 * the first superpage.  Fetching the fence is guaranteed to work
 	 * because that first superpage is translated the same way.
 	 */
-	/* LKM_CHECKPOINT name=EarlyVm.Online variant=EarlyVmOnline fingerprint=sha256:a6c18ae723f71bc365b8b970d16f0fa18bf47b973b95e592dd0234545aba90cb */
+	/* LKM_CHECKPOINT name=EarlyVm.TakeOver variant=EarlyVmTakeOver fingerprint=sha256:a6c18ae723f71bc365b8b970d16f0fa18bf47b973b95e592dd0234545aba90cb */
 	csrw CSR_SATP, a2
 	sfence.vma
 	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_KERNEL_IMAGE_ONLINE
-	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EARLY_VM_ONLINE
+	LKM_RUNTIME_CHECKPOINT LKM_CHECKPOINT_EARLY_VM_TAKE_OVER
 
 	ret
 #endif /* CONFIG_MMU */

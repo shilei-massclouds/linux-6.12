@@ -162,16 +162,16 @@ static const char *lkm_checkpoint_name(u8 id)
 		return "TrapType.Prepared";
 	case LKM_CHECKPOINT_EXCEPTION_TYPE_PREPARED:
 		return "ExceptionType.Prepared";
-	case LKM_CHECKPOINT_TRAMPOLINE_VM_ONLINE:
-		return "TrampolineVm.Online";
+	case LKM_CHECKPOINT_TRAMPOLINE_VM_TAKE_OVER:
+		return "TrampolineVm.TakeOver";
 	case LKM_CHECKPOINT_RAW_DTB_PREPARED:
 		return "RawDtb.Prepared";
 	case LKM_CHECKPOINT_RAW_DTB_READY:
 		return "RawDtb.Ready";
 	case LKM_CHECKPOINT_EARLY_VM_READY:
 		return "EarlyVm.Ready";
-	case LKM_CHECKPOINT_EARLY_VM_ONLINE:
-		return "EarlyVm.Online";
+	case LKM_CHECKPOINT_EARLY_VM_TAKE_OVER:
+		return "EarlyVm.TakeOver";
 	case LKM_CHECKPOINT_KERNEL_IMAGE_ONLINE:
 		return "KernelImage.Online";
 	case LKM_CHECKPOINT_TRAP_TYPE_READY:
