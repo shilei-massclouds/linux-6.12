@@ -98,6 +98,27 @@
 #include "../../io_uring/io-wq.h"
 #include "../smpboot.h"
 
+static u8 lkm_sched_class_id(const struct task_struct *task)
+{
+	const struct sched_class *class = task->sched_class;
+
+	if (class == &stop_sched_class)
+		return LKM_SCHED_CLASS_STOP;
+	if (class == &dl_sched_class)
+		return LKM_SCHED_CLASS_DEADLINE;
+	if (class == &rt_sched_class)
+		return LKM_SCHED_CLASS_REALTIME;
+	if (class == &fair_sched_class)
+		return LKM_SCHED_CLASS_FAIR;
+	if (class == &idle_sched_class)
+		return LKM_SCHED_CLASS_IDLE;
+#ifdef CONFIG_SCHED_CLASS_EXT
+	if (class == &ext_sched_class)
+		return LKM_SCHED_CLASS_EXT;
+#endif
+	return LKM_SCHED_CLASS_NONE;
+}
+
 EXPORT_TRACEPOINT_SYMBOL_GPL(ipi_send_cpu);
 EXPORT_TRACEPOINT_SYMBOL_GPL(ipi_send_cpumask);
 
@@ -5163,6 +5184,9 @@ static struct rq *finish_task_switch(struct task_struct *prev)
 	struct rq *rq = this_rq();
 	struct mm_struct *mm = rq->prev_mm;
 	unsigned int prev_state;
+	int prev_pid = prev->pid;
+	int next_pid = current->pid;
+	u8 prev_on_rq;
 
 	/*
 	 * The previous task will have left us with a preempt_count of 2
@@ -5194,6 +5218,7 @@ static struct rq *finish_task_switch(struct task_struct *prev)
 	 * transition, resulting in a double drop.
 	 */
 	prev_state = READ_ONCE(prev->__state);
+	prev_on_rq = READ_ONCE(prev->on_rq);
 	vtime_task_switch(prev);
 	perf_event_task_sched_in(prev, current);
 	finish_task(prev);
@@ -5237,6 +5262,12 @@ static struct rq *finish_task_switch(struct task_struct *prev)
 
 		put_task_struct_rcu_user(prev);
 	}
+
+	/* Next-stack differential checkpoint, after finish-task-switch cleanup. */
+	lkm_sched_checkpoint_record(
+		LKM_SCHED_STAGE_FINISH_RETURN, smp_processor_id(),
+		LKM_SCHED_MODE_UNAVAILABLE, prev_pid, next_pid, prev_state,
+		prev_on_rq, 0, lkm_sched_class_id(current));
 
 	return rq;
 }
@@ -6555,6 +6586,7 @@ static void __sched notrace __schedule(int sched_mode)
 	 */
 	bool preempt = sched_mode > SM_NONE;
 	bool block = false;
+	bool signal_recovered = false;
 	unsigned long *switch_count;
 	unsigned long prev_state;
 	struct rq_flags rf;
@@ -6564,6 +6596,12 @@ static void __sched notrace __schedule(int sched_mode)
 	cpu = smp_processor_id();
 	rq = cpu_rq(cpu);
 	prev = rq->curr;
+
+	/* Read-only differential checkpoint at schedule entry. */
+	lkm_sched_checkpoint_record(
+		LKM_SCHED_STAGE_ENTRY, cpu, sched_mode, prev->pid, -1,
+		READ_ONCE(prev->__state), READ_ONCE(prev->on_rq),
+		preempt ? LKM_SCHED_FLAG_PREEMPT : 0, LKM_SCHED_CLASS_NONE);
 
 	schedule_debug(prev, preempt);
 
@@ -6611,12 +6649,22 @@ static void __sched notrace __schedule(int sched_mode)
 	if (sched_mode == SM_IDLE) {
 		/* SCX must consult the BPF scheduler to tell if rq is empty */
 		if (!rq->nr_running && !scx_enabled()) {
+			lkm_sched_checkpoint_record(
+				LKM_SCHED_STAGE_PREPARE_PREV, cpu, sched_mode,
+				prev->pid, -1, prev_state, READ_ONCE(prev->on_rq),
+				0, LKM_SCHED_CLASS_NONE);
 			next = prev;
+			lkm_sched_checkpoint_record(
+				LKM_SCHED_STAGE_PICK_NEXT, cpu, sched_mode,
+				prev->pid, next->pid, prev_state,
+				READ_ONCE(prev->on_rq), 0,
+				lkm_sched_class_id(next));
 			goto picked;
 		}
 	} else if (!preempt && prev_state) {
 		if (signal_pending_state(prev_state, prev)) {
 			WRITE_ONCE(prev->__state, TASK_RUNNING);
+			signal_recovered = true;
 		} else {
 			int flags = DEQUEUE_NOCLOCK;
 
@@ -6644,8 +6692,19 @@ static void __sched notrace __schedule(int sched_mode)
 		}
 		switch_count = &prev->nvcsw;
 	}
+	lkm_sched_checkpoint_record(
+		LKM_SCHED_STAGE_PREPARE_PREV, cpu, sched_mode, prev->pid, -1,
+		READ_ONCE(prev->__state), READ_ONCE(prev->on_rq),
+		(preempt ? LKM_SCHED_FLAG_PREEMPT : 0) |
+		(signal_recovered ? LKM_SCHED_FLAG_SIGNAL_RECOVERED : 0) |
+		(block ? LKM_SCHED_FLAG_BLOCKED : 0),
+		LKM_SCHED_CLASS_NONE);
 
 	next = pick_next_task(rq, prev, &rf);
+	lkm_sched_checkpoint_record(
+		LKM_SCHED_STAGE_PICK_NEXT, cpu, sched_mode, prev->pid, next->pid,
+		READ_ONCE(prev->__state), READ_ONCE(prev->on_rq),
+		block ? LKM_SCHED_FLAG_BLOCKED : 0, lkm_sched_class_id(next));
 picked:
 	clear_tsk_need_resched(prev);
 	clear_preempt_need_resched();
@@ -6654,6 +6713,13 @@ picked:
 #endif
 
 	if (likely(prev != next)) {
+		/* Only a non-identity choice enters the physical switch path. */
+		lkm_sched_checkpoint_record(
+			LKM_SCHED_STAGE_SWITCH_ENTRY, cpu, sched_mode,
+			prev->pid, next->pid, READ_ONCE(prev->__state),
+			READ_ONCE(prev->on_rq),
+			block ? LKM_SCHED_FLAG_BLOCKED : 0,
+			lkm_sched_class_id(next));
 		rq->nr_switches++;
 		/*
 		 * RCU users of rcu_dereference(rq->curr) may not see

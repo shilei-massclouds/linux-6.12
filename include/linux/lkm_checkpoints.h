@@ -3,6 +3,27 @@
 #define _LINUX_LKM_CHECKPOINTS_H
 
 #define LKM_CHECKPOINT_BUFFER_CAPACITY 512
+#define LKM_SCHED_CHECKPOINT_BUFFER_CAPACITY 128
+
+#define LKM_SCHED_STAGE_ENTRY 1
+#define LKM_SCHED_STAGE_PREPARE_PREV 2
+#define LKM_SCHED_STAGE_PICK_NEXT 3
+#define LKM_SCHED_STAGE_SWITCH_ENTRY 4
+#define LKM_SCHED_STAGE_FINISH_RETURN 5
+
+#define LKM_SCHED_FLAG_PREEMPT 0x01
+#define LKM_SCHED_FLAG_SIGNAL_RECOVERED 0x02
+#define LKM_SCHED_FLAG_BLOCKED 0x04
+
+#define LKM_SCHED_CLASS_NONE 0
+#define LKM_SCHED_CLASS_STOP 1
+#define LKM_SCHED_CLASS_DEADLINE 2
+#define LKM_SCHED_CLASS_REALTIME 3
+#define LKM_SCHED_CLASS_FAIR 4
+#define LKM_SCHED_CLASS_IDLE 5
+#define LKM_SCHED_CLASS_EXT 6
+
+#define LKM_SCHED_MODE_UNAVAILABLE (-128)
 
 #define LKM_CHECKPOINT_KERNEL_STARTED 1
 #define LKM_CHECKPOINT_BOOT_INIT_FLOW_STARTED 2
@@ -127,6 +148,10 @@ void lkm_checkpoint_record_exec_satp_ready(void);
 void lkm_checkpoint_record_exec_context_replaced(void);
 void lkm_checkpoint_record_exec_trap_frame_ready(void);
 void lkm_checkpoint_record_exec_return_to_user(void);
+void lkm_sched_checkpoint_record(u8 stage, u16 cpu, s8 mode,
+				 s32 prev_pid, s32 next_pid,
+				 unsigned long prev_state, u8 prev_on_rq,
+				 u8 flags, u8 next_class);
 #else
 static inline void lkm_checkpoint_record(u8 id) {}
 static inline void lkm_checkpoint_exec_begin_boot(void) {}
@@ -139,6 +164,11 @@ static inline void lkm_checkpoint_record_exec_satp_ready(void) {}
 static inline void lkm_checkpoint_record_exec_context_replaced(void) {}
 static inline void lkm_checkpoint_record_exec_trap_frame_ready(void) {}
 static inline void lkm_checkpoint_record_exec_return_to_user(void) {}
+static inline void lkm_sched_checkpoint_record(u8 stage, u16 cpu, s8 mode,
+					       s32 prev_pid, s32 next_pid,
+					       unsigned long prev_state,
+					       u8 prev_on_rq, u8 flags,
+					       u8 next_class) {}
 #endif
 
 static inline int lkm_checkpoint_record_payload_handoff_committed(int ret)

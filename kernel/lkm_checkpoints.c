@@ -19,6 +19,22 @@ extern unsigned int lkm_checkpoint_overflow;
 
 static atomic_t lkm_checkpoint_dumped = ATOMIC_INIT(0);
 
+struct lkm_sched_checkpoint_event {
+	u8 stage;
+	u8 mode;
+	u8 prev_on_rq;
+	u8 flags;
+	u8 next_class;
+	u16 cpu;
+	s32 prev_pid;
+	s32 next_pid;
+	unsigned long prev_state;
+};
+
+static atomic_t lkm_sched_checkpoint_count = ATOMIC_INIT(0);
+static struct lkm_sched_checkpoint_event
+	lkm_sched_checkpoint_events[LKM_SCHED_CHECKPOINT_BUFFER_CAPACITY];
+
 static struct task_struct *lkm_checkpoint_exec_owner_task;
 static u8 lkm_checkpoint_exec_owner = LKM_CHECKPOINT_EXEC_OWNER_NONE;
 
@@ -86,6 +102,31 @@ void lkm_checkpoint_record(u8 id)
 	}
 
 	WRITE_ONCE(lkm_checkpoint_events[index], id);
+}
+
+void lkm_sched_checkpoint_record(u8 stage, u16 cpu, s8 mode,
+				 s32 prev_pid, s32 next_pid,
+				 unsigned long prev_state, u8 prev_on_rq,
+				 u8 flags, u8 next_class)
+{
+	struct lkm_sched_checkpoint_event *event;
+	int index = atomic_fetch_inc_relaxed(&lkm_sched_checkpoint_count);
+
+	if (index < 0 || index >= LKM_SCHED_CHECKPOINT_BUFFER_CAPACITY)
+		return;
+
+	event = &lkm_sched_checkpoint_events[index];
+	WRITE_ONCE(event->mode, mode);
+	WRITE_ONCE(event->prev_on_rq, prev_on_rq);
+	WRITE_ONCE(event->flags, flags);
+	WRITE_ONCE(event->next_class, next_class);
+	WRITE_ONCE(event->cpu, cpu);
+	WRITE_ONCE(event->prev_pid, prev_pid);
+	WRITE_ONCE(event->next_pid, next_pid);
+	WRITE_ONCE(event->prev_state, prev_state);
+	/* Publish the stage last so the dump cannot expose a partial record. */
+	smp_wmb();
+	WRITE_ONCE(event->stage, stage);
 }
 
 void lkm_checkpoint_record_exec_main_elf_ready(void)
@@ -398,6 +439,100 @@ static void lkm_put_ulong(unsigned long value)
 		lkm_console_write(&digits[len], 1);
 }
 
+static void lkm_put_long(long value)
+{
+	if (value < 0) {
+		lkm_console_write("-", 1);
+		value = -value;
+	}
+	lkm_put_ulong(value);
+}
+
+static const char *lkm_sched_stage_name(u8 stage)
+{
+	switch (stage) {
+	case LKM_SCHED_STAGE_ENTRY:
+		return "entry";
+	case LKM_SCHED_STAGE_PREPARE_PREV:
+		return "prepare_prev";
+	case LKM_SCHED_STAGE_PICK_NEXT:
+		return "pick_next";
+	case LKM_SCHED_STAGE_SWITCH_ENTRY:
+		return "switch_entry";
+	case LKM_SCHED_STAGE_FINISH_RETURN:
+		return "finish_return";
+	default:
+		return "unknown";
+	}
+}
+
+static const char *lkm_sched_class_name(u8 class)
+{
+	switch (class) {
+	case LKM_SCHED_CLASS_STOP:
+		return "stop";
+	case LKM_SCHED_CLASS_DEADLINE:
+		return "deadline";
+	case LKM_SCHED_CLASS_REALTIME:
+		return "realtime";
+	case LKM_SCHED_CLASS_FAIR:
+		return "fair";
+	case LKM_SCHED_CLASS_IDLE:
+		return "idle";
+	case LKM_SCHED_CLASS_EXT:
+		return "ext";
+	default:
+		return "none";
+	}
+}
+
+static void lkm_sched_checkpoints_dump(void)
+{
+	unsigned long total = atomic_read(&lkm_sched_checkpoint_count);
+	unsigned long saved = min(total,
+				  (unsigned long)LKM_SCHED_CHECKPOINT_BUFFER_CAPACITY);
+	unsigned long i;
+
+	lkm_puts("scheduler_diff_summary: total=");
+	lkm_put_ulong(total);
+	lkm_puts(" saved=");
+	lkm_put_ulong(saved);
+	lkm_puts(" dropped=");
+	lkm_put_ulong(total - saved);
+	lkm_console_write("\n", 1);
+
+	for (i = 0; i < saved; i++) {
+		struct lkm_sched_checkpoint_event *event =
+			&lkm_sched_checkpoint_events[i];
+		u8 stage = READ_ONCE(event->stage);
+
+		if (!stage)
+			continue;
+		smp_rmb();
+		lkm_puts("scheduler_diff: seq=");
+		lkm_put_ulong(i);
+		lkm_puts(" stage=");
+		lkm_puts(lkm_sched_stage_name(stage));
+		lkm_puts(" cpu=");
+		lkm_put_ulong(READ_ONCE(event->cpu));
+		lkm_puts(" mode=");
+		lkm_put_long((s8)READ_ONCE(event->mode));
+		lkm_puts(" prev=");
+		lkm_put_long(READ_ONCE(event->prev_pid));
+		lkm_puts(" next=");
+		lkm_put_long(READ_ONCE(event->next_pid));
+		lkm_puts(" prev_state=");
+		lkm_put_ulong(READ_ONCE(event->prev_state));
+		lkm_puts(" prev_on_rq=");
+		lkm_put_ulong(READ_ONCE(event->prev_on_rq));
+		lkm_puts(" flags=");
+		lkm_put_ulong(READ_ONCE(event->flags));
+		lkm_puts(" class=");
+		lkm_puts(lkm_sched_class_name(READ_ONCE(event->next_class)));
+		lkm_console_write("\n", 1);
+	}
+}
+
 static char lkm_hex_digit(unsigned int value)
 {
 	if (value < 10)
@@ -444,6 +579,8 @@ void lkm_checkpoints_dump(void)
 
 	if (atomic_cmpxchg(&lkm_checkpoint_dumped, 0, 1) != 0)
 		return;
+
+	lkm_sched_checkpoints_dump();
 
 	total_events = READ_ONCE(lkm_checkpoint_count);
 	saved_events = min(total_events, (unsigned long)LKM_CHECKPOINT_BUFFER_CAPACITY);
