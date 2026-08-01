@@ -297,7 +297,7 @@ SYM_CODE_START_NOALIGN(ret_from_exception)
 	andi s0, a0, SR_SPP
 	bnez s0, .L_lkm_skip_user_return_checkpoints
 	/* LKM_CHECKPOINT name=UserExec.SatpSwitched variant=UserExecSatpSwitched fingerprint=sha256:c86192c80eef5c3dd657d0f3e3e42ef03ca1b38f251709dae1bc3b23f4d8398e */
-	/* LKM_CHECKPOINT name=UserAppFlow.EnterUserMode variant=UserAppFlowEnterUserMode fingerprint=sha256:4e123c759fc00f1992c0cd1da108bbd5e1bf5e43e54bd87da816ea2f0d44593b */
+	/* LKM_CHECKPOINT name=UserAppRuntime.EnterUserMode variant=UserAppRuntimeEnterUserMode fingerprint=sha256:4e123c759fc00f1992c0cd1da108bbd5e1bf5e43e54bd87da816ea2f0d44593b */
 	/* LKM_CHECKPOINT name=UserExec.ReturnFrameReady variant=UserExecReturnFrameReady fingerprint=sha256:4e123c759fc00f1992c0cd1da108bbd5e1bf5e43e54bd87da816ea2f0d44593b */
 	call lkm_checkpoint_record_exec_return_to_user
 	REG_L a0, PT_STATUS(sp)
