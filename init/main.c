@@ -927,8 +927,6 @@ void start_kernel(void)
 	boot_cpu_init();
 	page_address_init();
 	pr_notice("%s", linux_banner);
-	/* LKM_CHECKPOINT name=CorePreparePhase.Started variant=CorePreparePhaseStarted fingerprint=sha256:10e9e0f1a53639fedf6f4bedb5982f76fe2ece2fb13242af3ac443e60043c248 */
-	lkm_checkpoint_record(LKM_CHECKPOINT_CORE_PREPARE_PHASE_STARTED);
 	setup_arch(&command_line);
 	/* Static keys and static calls are needed by LSMs */
 	jump_label_init();
