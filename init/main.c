@@ -911,6 +911,7 @@ void start_kernel(void)
 	char *after_dashes;
 
 	set_task_stack_end_magic(&init_task);
+	/* LKM_CHECKPOINT name=BootTask.StackGuardEnabled variant=BootTaskStackGuardEnabled fingerprint=sha256:dc165b2dc3413bb4adf245dd475b5e7c924be05f06149dfd8ef9cc7c9369c35c */
 	smp_setup_processor_id();
 	debug_objects_early_init();
 	init_vmlinux_build_id();
