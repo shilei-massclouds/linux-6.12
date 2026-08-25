@@ -1066,6 +1066,8 @@ unsigned long kaslr_offset(void)
 }
 #endif
 
+#include "lkm2_checkpoints.inc"
+
 asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 {
 	pmd_t __maybe_unused fix_bmap_spmd, fix_bmap_epmd;
@@ -1159,6 +1161,9 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 	relocate_kernel();
 #endif
 
+	lkm2_checkpoint_kernel_map_ready();
+	lkm2_checkpoint_preset_complete();
+
 	apply_early_boot_alternatives();
 	pt_ops_set_early();
 
@@ -1198,6 +1203,7 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 	create_pgd_mapping(trampoline_pg_dir, kernel_map.virt_addr,
 			   kernel_map.phys_addr, PGDIR_SIZE, PAGE_KERNEL_EXEC);
 #endif
+	lkm2_checkpoint_trampoline_ready();
 
 	/*
 	 * Setup early PGD covering entire kernel which will allow
@@ -1205,9 +1211,12 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 	 * in setup_vm_final() below.
 	 */
 	create_kernel_page_table(early_pg_dir, true);
+	lkm2_checkpoint_early_kernel_ready();
 
 	/* Setup early mapping for FDT early scan */
 	create_fdt_early_page_table(__fix_to_virt(FIX_FDT), dtb_pa);
+	lkm2_checkpoint_early_dtb_ready();
+	lkm2_checkpoint_setup_complete();
 
 	/*
 	 * Bootime fixmap only can handle PMD_SIZE mapping. Thus, boot-ioremap

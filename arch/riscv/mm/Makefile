@@ -1,18 +1,24 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
 CFLAGS_init.o := -mcmodel=medany
+CFLAGS_lkm2_checkpoint_handler.o := -mcmodel=medany
 ifdef CONFIG_RELOCATABLE
 CFLAGS_init.o += -fno-pie
+CFLAGS_lkm2_checkpoint_handler.o += -fno-pie
 endif
 
 ifdef CONFIG_FTRACE
 CFLAGS_REMOVE_init.o = $(CC_FLAGS_FTRACE)
+CFLAGS_REMOVE_lkm2_checkpoint_handler.o = $(CC_FLAGS_FTRACE)
 CFLAGS_REMOVE_cacheflush.o = $(CC_FLAGS_FTRACE)
 endif
 
 KCOV_INSTRUMENT_init.o := n
+KCOV_INSTRUMENT_lkm2_checkpoint_handler.o := n
+KASAN_SANITIZE_lkm2_checkpoint_handler.o := n
+KCSAN_SANITIZE_lkm2_checkpoint_handler.o := n
 
-obj-y += init.o
+obj-y += init.o lkm2_checkpoint_handler.o
 obj-$(CONFIG_MMU) += extable.o fault.o pageattr.o pgtable.o tlbflush.o
 obj-y += cacheflush.o
 obj-y += context.o
