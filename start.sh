@@ -1,5 +1,5 @@
 QEMU=qemu-system-riscv64
-DISK=../lkm/impl/arceos_ex/build/virtio-blk.raw
+DISK=../lkm2/impl/arceos_ex/build/virtio-blk.raw
 
 if [ $# -ne 1 ]; then
   APP=/sbin/init
