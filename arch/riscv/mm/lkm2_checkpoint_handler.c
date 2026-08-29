@@ -372,3 +372,89 @@ void lkm_checkpoint_vm_ready_invariant_vm_setup_completes_with_satp_bare_baf3733
 	lkm2_cp_write_hex(arg0);
 	lkm2_cp_write_byte('\n');
 }
+
+void lkm_checkpoint_swapperpagetable_online_invariant_vm_ready_b73b881b5f980ae3(void)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Online.Invariant.Vm.Ready hash=b73b881b5f980ae3");
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_swapperpagetable_online_invariant_memblock_online_90bad5fa0e5750ee(void)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Online.Invariant.MemBlock.Online hash=90bad5fa0e5750ee");
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_swapperpagetable_online_invariant_swapper_fixmap_established_b4e9868ff5db1567(uint64_t arg0, uint64_t arg1)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Online.Invariant.swapper_fixmap_established hash=b4e9868ff5db1567");
+	lkm2_cp_write_bytes(" mode=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" fixmap_va=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_swapperpagetable_online_invariant_swapper_linear_map_established_728a216973172b02(uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Online.Invariant.swapper_linear_map_established hash=728a216973172b02");
+	lkm2_cp_write_bytes(" mode=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" linear_va=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_bytes(" linear_pa=0x");
+	lkm2_cp_write_hex(arg2);
+	lkm2_cp_write_bytes(" linear_flags=0x");
+	lkm2_cp_write_hex(arg3);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_swapperpagetable_online_invariant_swapper_kernel_map_established_179177a1c0dccae0(uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Online.Invariant.swapper_kernel_map_established hash=179177a1c0dccae0");
+	lkm2_cp_write_bytes(" mode=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" kernel_va=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_bytes(" kernel_pa=0x");
+	lkm2_cp_write_hex(arg2);
+	lkm2_cp_write_bytes(" kernel_flags=0x");
+	lkm2_cp_write_hex(arg3);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_swapperpagetable_online_invariant_swapper_fixmap_cleared_9c02b21480ffe619(uint64_t arg0)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Online.Invariant.swapper_fixmap_cleared hash=9c02b21480ffe619");
+	lkm2_cp_write_bytes(" fixmap_cleared=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_swapperpagetable_online_invariant_swapper_satp_switched_1d8d3a55ec020181(uint64_t arg0, uint64_t arg1)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Online.Invariant.swapper_satp_switched hash=1d8d3a55ec020181");
+	lkm2_cp_write_bytes(" mode=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" satp_switched=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_swapperpagetable_online_invariant_swapper_tlb_flush_completed_8981df90abec42b7(uint64_t arg0)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Online.Invariant.swapper_tlb_flush_completed hash=8981df90abec42b7");
+	lkm2_cp_write_bytes(" tlb_flush_completed=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_swapperpagetable_online_invariant_swapper_late_paging_mode_selected_2d17c470e116aaa3(uint64_t arg0, uint64_t arg1)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Online.Invariant.swapper_late_paging_mode_selected hash=2d17c470e116aaa3");
+	lkm2_cp_write_bytes(" mode=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" late_mode_selected=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_byte('\n');
+}

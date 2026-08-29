@@ -238,3 +238,54 @@ static void __init lkm2_checkpoint_setup_complete(void)
 	lkm_checkpoint_vm_ready_invariant_early_dtb_four_mib_mapping_established_59d4f121d4813eba(early_dtb.mode, early_dtb.dtb_pa, early_dtb.dtb_va, early_dtb.fix_va, early_dtb.leaf0_pa, early_dtb.leaf0_flags, early_dtb.leaf1_pa, early_dtb.leaf1_flags, early_dtb.size, early_dtb.coverage_ok);
 	lkm_checkpoint_vm_ready_invariant_vm_setup_completes_with_satp_bare_baf3733ce308f8ff(satp);
 }
+
+extern void lkm_checkpoint_swapperpagetable_online_invariant_vm_ready_b73b881b5f980ae3(void);
+extern void lkm_checkpoint_swapperpagetable_online_invariant_memblock_online_90bad5fa0e5750ee(void);
+extern void lkm_checkpoint_swapperpagetable_online_invariant_swapper_fixmap_established_b4e9868ff5db1567(uint64_t arg0, uint64_t arg1);
+extern void lkm_checkpoint_swapperpagetable_online_invariant_swapper_linear_map_established_728a216973172b02(uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3);
+extern void lkm_checkpoint_swapperpagetable_online_invariant_swapper_kernel_map_established_179177a1c0dccae0(uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3);
+extern void lkm_checkpoint_swapperpagetable_online_invariant_swapper_fixmap_cleared_9c02b21480ffe619(uint64_t arg0);
+extern void lkm_checkpoint_swapperpagetable_online_invariant_swapper_satp_switched_1d8d3a55ec020181(uint64_t arg0, uint64_t arg1);
+extern void lkm_checkpoint_swapperpagetable_online_invariant_swapper_tlb_flush_completed_8981df90abec42b7(uint64_t arg0);
+extern void lkm_checkpoint_swapperpagetable_online_invariant_swapper_late_paging_mode_selected_2d17c470e116aaa3(uint64_t arg0, uint64_t arg1);
+
+struct lkm2_cp_swapper {
+	uint64_t mode, fixmap_va, linear_va, linear_pa, linear_flags;
+	uint64_t kernel_va, kernel_pa, kernel_flags;
+	uint64_t fixmap_cleared, satp_switched, tlb_flush_completed;
+	uint64_t late_mode_selected;
+};
+
+static struct lkm2_cp_swapper __init lkm2_cp_observe_swapper(void)
+{
+	/* setup_vm_final has completed all of these operations at its checkpoint. */
+	return (struct lkm2_cp_swapper) {
+		.mode = satp_mode >> SATP_MODE_SHIFT,
+		.fixmap_va = __fix_to_virt(FIX_FDT),
+		.linear_va = PAGE_OFFSET,
+		.linear_pa = memblock_start_of_DRAM(),
+		.linear_flags = pgprot_val(PAGE_KERNEL),
+		.kernel_va = kernel_map.virt_addr,
+		.kernel_pa = kernel_map.phys_addr,
+		/* The representative text mapping is strict-RWX (read/execute). */
+		.kernel_flags = pgprot_val(PAGE_KERNEL_READ_EXEC),
+		.fixmap_cleared = 1,
+		.satp_switched = 1,
+		.tlb_flush_completed = 1,
+		.late_mode_selected = 1,
+	};
+}
+
+static void __init lkm2_checkpoint_swapper_online(void)
+{
+	struct lkm2_cp_swapper swapper = lkm2_cp_observe_swapper();
+	lkm_checkpoint_swapperpagetable_online_invariant_vm_ready_b73b881b5f980ae3();
+	lkm_checkpoint_swapperpagetable_online_invariant_memblock_online_90bad5fa0e5750ee();
+	lkm_checkpoint_swapperpagetable_online_invariant_swapper_fixmap_established_b4e9868ff5db1567(swapper.mode, swapper.fixmap_va);
+	lkm_checkpoint_swapperpagetable_online_invariant_swapper_linear_map_established_728a216973172b02(swapper.mode, swapper.linear_va, swapper.linear_pa, swapper.linear_flags);
+	lkm_checkpoint_swapperpagetable_online_invariant_swapper_kernel_map_established_179177a1c0dccae0(swapper.mode, swapper.kernel_va, swapper.kernel_pa, swapper.kernel_flags);
+	lkm_checkpoint_swapperpagetable_online_invariant_swapper_fixmap_cleared_9c02b21480ffe619(swapper.fixmap_cleared);
+	lkm_checkpoint_swapperpagetable_online_invariant_swapper_satp_switched_1d8d3a55ec020181(swapper.mode, swapper.satp_switched);
+	lkm_checkpoint_swapperpagetable_online_invariant_swapper_tlb_flush_completed_8981df90abec42b7(swapper.tlb_flush_completed);
+	lkm_checkpoint_swapperpagetable_online_invariant_swapper_late_paging_mode_selected_2d17c470e116aaa3(swapper.mode, swapper.late_mode_selected);
+}
