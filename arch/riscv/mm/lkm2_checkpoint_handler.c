@@ -458,3 +458,127 @@ void lkm_checkpoint_swapperpagetable_online_invariant_swapper_late_paging_mode_s
 	lkm2_cp_write_hex(arg1);
 	lkm2_cp_write_byte('\n');
 }
+
+void lkm_checkpoint_memblockmemory_enable_establishes_memblock_memory_derived_from_dtb_2ffc6e5d0fa4b50b(uint64_t arg0, uint64_t arg1)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockMemory.Enable.Establishes.memblock_memory_derived_from_dtb hash=2ffc6e5d0fa4b50b");
+	lkm2_cp_write_bytes(" memory_count=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" memory_digest=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblockmemory_online_invariant_dtbblob_online_32a85f95a2393857(void)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockMemory.Online.Invariant.DtbBlob.Online hash=32a85f95a2393857");
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblockmemory_online_invariant_dtb_blob_describes_nonempty_valid_physical_memory_eac36c0e1e722e4f(void)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockMemory.Online.Invariant.dtb_blob_describes_nonempty_valid_physical_memory hash=eac36c0e1e722e4f");
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblockmemory_online_invariant_memblock_memory_derived_from_dtb_d7631211092b2931(uint64_t arg0, uint64_t arg1)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockMemory.Online.Invariant.memblock_memory_derived_from_dtb hash=d7631211092b2931");
+	lkm2_cp_write_bytes(" memory_count=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" memory_digest=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblockreserved_enable_establishes_memblock_required_reservations_complete_413cd39d2bed340e(uint64_t arg0, uint64_t arg1)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockReserved.Enable.Establishes.memblock_required_reservations_complete hash=413cd39d2bed340e");
+	lkm2_cp_write_bytes(" reserved_count=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" reserved_digest=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblockreserved_online_invariant_memblockmemory_online_78c4c05f5ebf8e49(void)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockReserved.Online.Invariant.MemBlockMemory.Online hash=78c4c05f5ebf8e49");
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblockreserved_online_invariant_dtbblob_online_e26363e7b7b4ecf7(void)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockReserved.Online.Invariant.DtbBlob.Online hash=e26363e7b7b4ecf7");
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblockreserved_online_invariant_kernelimage_ready_cceee4a5d717d223(void)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockReserved.Online.Invariant.KernelImage.Ready hash=cceee4a5d717d223");
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblockreserved_online_invariant_dtb_blob_physical_range_valid_69bcc14d86d4f75d(void)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockReserved.Online.Invariant.dtb_blob_physical_range_valid hash=69bcc14d86d4f75d");
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblockreserved_online_invariant_dtb_blob_reserve_map_and_reserved_memory_valid_097ab61dd5c0fa08(void)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockReserved.Online.Invariant.dtb_blob_reserve_map_and_reserved_memory_valid hash=097ab61dd5c0fa08");
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblockreserved_online_invariant_memblock_required_reservations_complete_17cdb2182de73382(uint64_t arg0, uint64_t arg1)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlockReserved.Online.Invariant.memblock_required_reservations_complete hash=17cdb2182de73382");
+	lkm2_cp_write_bytes(" reserved_count=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" reserved_digest=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblock_online_invariant_memblockmemory_online_4978f36ab8383c7f(uint64_t arg0, uint64_t arg1)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlock.Online.Invariant.MemBlockMemory.Online hash=4978f36ab8383c7f");
+	lkm2_cp_write_bytes(" memory_count=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" memory_digest=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_memblock_online_invariant_memblockreserved_online_4d817b61472795cc(uint64_t arg0, uint64_t arg1)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=MemBlock.Online.Invariant.MemBlockReserved.Online hash=4d817b61472795cc");
+	lkm2_cp_write_bytes(" reserved_count=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" reserved_digest=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm2_checkpoint_memory_range(uint64_t index, uint64_t base, uint64_t end)
+{
+	lkm2_cp_write_bytes("LKMRNG1 kind=memory index=0x");
+	lkm2_cp_write_hex(index);
+	lkm2_cp_write_bytes(" base=0x");
+	lkm2_cp_write_hex(base);
+	lkm2_cp_write_bytes(" end=0x");
+	lkm2_cp_write_hex(end);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm2_checkpoint_reserved_range(uint64_t index, uint64_t base, uint64_t end)
+{
+	lkm2_cp_write_bytes("LKMRNG1 kind=reserved index=0x");
+	lkm2_cp_write_hex(index);
+	lkm2_cp_write_bytes(" base=0x");
+	lkm2_cp_write_hex(base);
+	lkm2_cp_write_bytes(" end=0x");
+	lkm2_cp_write_hex(end);
+	lkm2_cp_write_byte('\n');
+}

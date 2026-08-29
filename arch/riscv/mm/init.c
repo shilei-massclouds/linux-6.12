@@ -1407,6 +1407,10 @@ static void __init arch_reserve_crashkernel(void)
 void __init paging_init(void)
 {
 	setup_bootmem();
+	lkm2_checkpoint_memblock_ready();
+	lkm2_checkpoint_memblock_memory_online();
+	lkm2_checkpoint_memblock_reserved_online();
+	lkm2_checkpoint_memblock_online();
 	setup_vm_final();
 
 	/* Depend on that Linear Mapping is ready */
