@@ -582,3 +582,65 @@ void lkm2_checkpoint_reserved_range(uint64_t index, uint64_t base, uint64_t end)
 	lkm2_cp_write_hex(end);
 	lkm2_cp_write_byte('\n');
 }
+
+void lkm_checkpoint_swapperpagetable_content_fixmap_1b5e2b9649895da5(uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Content.fixmap hash=1b5e2b9649895da5");
+	lkm2_cp_write_bytes(" valid=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" count=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_bytes(" digest_lo=0x");
+	lkm2_cp_write_hex(arg2);
+	lkm2_cp_write_bytes(" digest_hi=0x");
+	lkm2_cp_write_hex(arg3);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_swapperpagetable_content_linear_8d9969b8ad2f73e1(uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Content.linear hash=8d9969b8ad2f73e1");
+	lkm2_cp_write_bytes(" valid=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_bytes(" count=0x");
+	lkm2_cp_write_hex(arg1);
+	lkm2_cp_write_bytes(" digest_lo=0x");
+	lkm2_cp_write_hex(arg2);
+	lkm2_cp_write_bytes(" digest_hi=0x");
+	lkm2_cp_write_hex(arg3);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm_checkpoint_swapperpagetable_content_kernel_walk_valid_3eebd41d30f56760(uint64_t arg0)
+{
+	lkm2_cp_write_bytes("LKMCP1 id=SwapperPageTable.Content.kernel_walk_valid hash=3eebd41d30f56760");
+	lkm2_cp_write_bytes(" valid=0x");
+	lkm2_cp_write_hex(arg0);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm2_checkpoint_content_chunk(uint64_t class_id, uint64_t chunk,
+				   uint64_t count, uint64_t lo, uint64_t hi)
+{
+	const char *name = class_id == 1 ? "fixmap" :
+		(class_id == 2 ? "linear" : "kernel");
+	lkm2_cp_write_bytes("LKMPTC1 class="); lkm2_cp_write_bytes(name);
+	lkm2_cp_write_bytes(" chunk=0x"); lkm2_cp_write_hex(chunk);
+	lkm2_cp_write_bytes(" count=0x"); lkm2_cp_write_hex(count);
+	lkm2_cp_write_bytes(" digest_lo=0x"); lkm2_cp_write_hex(lo);
+	lkm2_cp_write_bytes(" digest_hi=0x"); lkm2_cp_write_hex(hi);
+	lkm2_cp_write_byte('\n');
+}
+
+void lkm2_checkpoint_content_item(uint64_t class_id, uint64_t index,
+				  uint64_t va, uint64_t pa, uint64_t flags)
+{
+	const char *name = class_id == 1 ? "fixmap" :
+		(class_id == 2 ? "linear" : "kernel");
+	lkm2_cp_write_bytes("LKMPTI1 class="); lkm2_cp_write_bytes(name);
+	lkm2_cp_write_bytes(" index=0x"); lkm2_cp_write_hex(index);
+	lkm2_cp_write_bytes(" va=0x"); lkm2_cp_write_hex(va);
+	lkm2_cp_write_bytes(" pa=0x"); lkm2_cp_write_hex(pa);
+	lkm2_cp_write_bytes(" flags=0x"); lkm2_cp_write_hex(flags);
+	lkm2_cp_write_byte('\n');
+}

@@ -1363,6 +1363,7 @@ static void __init setup_vm_final(void)
 
 	pt_ops_set_late();
 	lkm2_checkpoint_swapper_online();
+	lkm2_checkpoint_swapper_content();
 }
 #else
 asmlinkage void __init setup_vm(uintptr_t dtb_pa)
